@@ -86,9 +86,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Jump()
     {
-        Vector3 velocity = m_playerRigidbody.velocity;
+        Vector3 velocity = m_playerRigidbody.linearVelocity;
         velocity.y = 0;
-        m_playerRigidbody.velocity = velocity;
+        m_playerRigidbody.linearVelocity = velocity;
 
         m_playerRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
@@ -131,7 +131,7 @@ public class PlayerMovement : MonoBehaviour
 
         // Movimiento a lo largo de la pared
         Vector3 alongWall = Vector3.Cross(wallNormal, Vector3.up);
-        m_playerRigidbody.velocity = alongWall.normalized * wallRunSpeed;
+        m_playerRigidbody.linearVelocity = alongWall.normalized * wallRunSpeed;
     }
 
     void StopWallRun()
@@ -146,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
     {
         StopWallRun();
         Vector3 jumpDirection = wallNormal + Vector3.up;
-        m_playerRigidbody.velocity = Vector3.zero;
+        m_playerRigidbody.linearVelocity = Vector3.zero;
         m_playerRigidbody.AddForce(jumpDirection.normalized * wallJumpForce, ForceMode.Impulse);
     }
     
