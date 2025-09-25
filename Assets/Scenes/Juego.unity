@@ -240,7 +240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 582522acbb104624faca2eef4b32d696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isActivated: 0
+isActivated: 0
+
   visualFeedback: {fileID: 0}
   switchAnimator: {fileID: 0}
   activationEffect: {fileID: 0}
@@ -259,6 +260,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+git checkout --theirs -- Assets/Scenes/Juego.unity
+git add Assets/Scenes/Juego.unity
+git commit -m "Use Damian's version for Juego.unity to resolve conflict"
 
 --- !u!1 &160666010
 GameObject:
@@ -274,9 +278,10 @@ GameObject:
   - component: {fileID: 160666013}
   - component: {fileID: 160666011}
   - component: {fileID: 160666017}
+  - component: {fileID: 160666018}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -422,6 +427,27 @@ MonoBehaviour:
   wallJumpForce: 5
   playerCamera: {fileID: 963194227}
   canMove: 1
+--- !u!114 &160666018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 160666010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 811aa8adb0423a04daaed172744350e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundCheckDistance: 1.1
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  isGrounded: 0
+  fallStartHeight: 0
+  isFalling: 0
+  enableFallDamage: 1
+  deathHeight: -50
 --- !u!1 &169256668
 GameObject:
   m_ObjectHideFlags: 3
@@ -6126,7 +6152,7 @@ GameObject:
   - component: {fileID: 1140729143}
   - component: {fileID: 1140729145}
   - component: {fileID: 1140729144}
-  - component: {fileID: 1140729146}
+ - component: {fileID: 1140729146}
   m_Layer: 0
   m_Name: GameManagerLife
   m_TagString: Player
