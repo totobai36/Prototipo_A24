@@ -6152,7 +6152,6 @@ GameObject:
   - component: {fileID: 1140729143}
   - component: {fileID: 1140729145}
   - component: {fileID: 1140729144}
- - component: {fileID: 1140729146}
   m_Layer: 0
   m_Name: GameManagerLife
   m_TagString: Player
