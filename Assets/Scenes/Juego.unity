@@ -241,7 +241,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
 isActivated: 0
-
   visualFeedback: {fileID: 0}
   switchAnimator: {fileID: 0}
   activationEffect: {fileID: 0}
@@ -6152,6 +6151,8 @@ GameObject:
   - component: {fileID: 1140729143}
   - component: {fileID: 1140729145}
   - component: {fileID: 1140729144}
+  - component: {fileID: 1140729146}
+
   m_Layer: 0
   m_Name: GameManagerLife
   m_TagString: Player
@@ -6326,7 +6327,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-
 --- !u!43 &1196265214
 Mesh:
   m_ObjectHideFlags: 0
@@ -9436,7 +9436,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2085026244}
   m_CullTransparentMesh: 1
-
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
