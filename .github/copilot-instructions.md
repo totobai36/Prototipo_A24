@@ -6,9 +6,9 @@
   - Tags:
     - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ground, WallRun
   - Layers:
-    - Default, TransparentFX, Ignore Raycast, Water, UI, Ground
+    - Default, TransparentFX, Ignore Raycast, Water, UI
 - Active game object:
-  - Name: Camera
+  - Name: ExtractionPoint
   - Tag: Untagged
   - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
