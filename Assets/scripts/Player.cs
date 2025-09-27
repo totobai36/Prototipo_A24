@@ -3,215 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Player : MonoBehaviour
-{/*
-    //Movimiento
-    [SerializeField] private float velocidadMovimiento = 5.0f;
-    [SerializeField] private float velocidadRotacion = 200.0f;
-    private Animator anim;
-    [SerializeField] private float x, y;
-
-
-
-    //Salto
-    [SerializeField] private Rigidbody rb;
-    [SerializeField] private float fuerzaDeSalto = 4f;
-    public bool Saltar;
-    [SerializeField] private float timer = 4f;
-
-    //WallRun
-    [SerializeField] private float wallRunSpeed = 6f;
-    [SerializeField] private float wallRunDuration = 3f;
-    [SerializeField] private float wallJumpForce = 8f;
-    [SerializeField] private float wallJumpSideForce = 5f;
-    [SerializeField] private LayerMask wallLayer = -1;
-    [SerializeField] private float wallCheckDistance = 0.6f;
-    [SerializeField] private float minWallRunHeight = 1f;
-
-    private bool isWallRunning = false;
-    private Vector3 wallNormal;
-    private Vector3 wallForward;
-    private RaycastHit leftWallHit;
-    private RaycastHit rightWallHit;
-    private bool wallLeft = false;
-    private bool wallRight = false;
-    private float wallRunTimer = 0f;
-    void Start()
-    {
-        Saltar = false;
-        anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
-    }
-
-    void FixedUpdate()
-    {
-        if (!isWallRunning)
-        {
-            transform.Rotate(0, x * Time.deltaTime * velocidadRotacion, 0);
-            transform.Translate(0, 0, y * Time.deltaTime * velocidadMovimiento);
-        }
-
-    }
-    void Update()
-    {
-        x = Input.GetAxis("Horizontal");
-        y = Input.GetAxis("Vertical");
-
-        CheckForWalls();
-        WallRunInput();
-
-        if (isWallRunning)
-        {
-            WallRunMovement();
-        }
-        else
-        {
-            anim.SetFloat("VelX", x);
-            anim.SetFloat("VelY", y);
-
-            if (Saltar)
-            {
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    anim.SetBool("Salto", true);
-                    timer = Time.deltaTime;
-                    rb.AddForce(new Vector3(0, fuerzaDeSalto, 0), ForceMode.Impulse);
-                }
-                anim.SetBool("Suelo", true);
-            }
-            else
-            {
-                EstoyCayendo();
-            }
-        }
-
-        if (Saltar)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                anim.SetBool("Salto", true);
-                timer = Time.deltaTime;
-                rb.AddForce(new Vector3(0, fuerzaDeSalto, 0), ForceMode.Impulse);
-            }
-            anim.SetBool("Suelo", true);
-        }
-        else
-        {
-            EstoyCayendo();
-        }
-    }
-    void CheckForWalls()
-    {
-        // Verificar pared izquierda
-        wallLeft = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallCheckDistance, wallLayer);
-
-        // Verificar pared derecha  
-        wallRight = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallCheckDistance, wallLayer);
-
-        // Debug visual
-        Debug.DrawRay(transform.position, -transform.right * wallCheckDistance, wallLeft ? Color.green : Color.red);
-        Debug.DrawRay(transform.position, transform.right * wallCheckDistance, wallRight ? Color.green : Color.red);
-    }
-
-    void WallRunInput()
-    {
-        // Iniciar wallrun si hay una pared y nos estamos moviendo hacia adelante
-        if ((wallLeft || wallRight) && y > 0 && !Saltar && !isWallRunning)
-        {
-            StartWallRun();
-        }
-
-        // Terminar wallrun si saltamos o no hay input hacia adelante
-        if (isWallRunning)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                WallJump();
-            }
-            else if (y <= 0 || (!wallLeft && !wallRight) || wallRunTimer <= 0)
-            {
-                StopWallRun();
-            }
-        }
-    }
-
-    void StartWallRun()
-    {
-        isWallRunning = true;
-        wallRunTimer = wallRunDuration;
-
-        // Determinar la normal de la pared y direcci�n hacia adelante
-        wallNormal = wallRight ? rightWallHit.normal : leftWallHit.normal;
-        wallForward = Vector3.Cross(wallNormal, transform.up);
-
-        // Asegurar que la direcci�n hacia adelante apunte en la direcci�n correcta
-        if (Vector3.Dot(wallForward, transform.forward) < 0)
-            wallForward = -wallForward;
-
-        // Cancelar velocidad hacia abajo
-        if (rb.linearVelocity.y < 0)
-        {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
-        }
-
-        // Animaci�n de wallrun 
-        /*anim.SetBool("WallRun", true);
-        anim.SetBool("WallRunLeft", wallLeft);
-        anim.SetBool("WallRunRight", wallRight);--
-    }
-
-    void WallRunMovement()
-    {
-        wallRunTimer -= Time.deltaTime;
-
-        // Aplicar fuerza hacia adelante a lo largo de la pared
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z) + wallForward * wallRunSpeed;
-
-        // Aplicar una peque�a fuerza hacia la pared para mantener contacto
-        rb.AddForce(-wallNormal * 100, ForceMode.Force);
-
-        // Aplicar gravedad reducida
-        rb.AddForce(transform.up * -9.81f * 0.3f, ForceMode.Acceleration);
-    }
-
-    void WallJump()
-    {
-        StopWallRun();
-
-        Vector3 wallJumpDirection = (wallNormal + transform.up).normalized;
-
-        // Resetear velocidad antes del salto
-        rb.linearVelocity = Vector3.zero;
-
-        // Aplicar fuerza de salto
-        rb.AddForce(wallJumpDirection * wallJumpForce, ForceMode.Impulse);
-        rb.AddForce(wallForward * wallJumpSideForce, ForceMode.Impulse);
-
-        // Animaci�n de salto
-        /*anim.SetBool("Salto", true);
-        anim.SetBool("WallJump",  true);--
-    }
-
-    void StopWallRun()
-    {
-        isWallRunning = false;
-
-        // Resetear animaciones
-        /*anim.SetBool("WallRun", false);
-        anim.SetBool("WallRunLeft", false);
-        anim.SetBool("WallRunRight", false);
-        anim.SetBool("WallJump", false);-
-    }
-    void EstoyCayendo()
-    {
-        anim.SetBool("Suelo", false);
-        anim.SetBool("Salto", false);
-    }
-
-    public bool IsWallRunning()
-    {
-        return isWallRunning;
-    }
-        */
+{
     [Header("Movimiento")]
     [SerializeField] private float velocidadMovimiento = 5.0f;
     [SerializeField] private float velocidadRotacion = 200.0f;
@@ -232,7 +24,8 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask wallLayer = -1;
     [SerializeField] private float wallCheckDistance = 1.2f;
     [SerializeField] private float minWallRunHeight = 1f;
-    [SerializeField] private float wallRunGravity = 3f; // Gravedad reducida durante wallrun
+    [SerializeField] private float wallRunGravity = 2f; // Gravedad reducida durante wallrun
+    [SerializeField] private float minVelocityForWallRun = 2f;
 
     private bool isWallRunning = false;
     private Vector3 wallNormal;
@@ -336,6 +129,10 @@ public class Player : MonoBehaviour
 
     bool CanStartWallRun()
     {
+        // Calcular velocidad horizontal (sin Y)
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        float currentSpeed = horizontalVelocity.magnitude;
+
         return (wallLeft || wallRight) &&
                y > 0.1f && // Debe moverse hacia adelante
                !Saltar && // No debe estar en el suelo
@@ -362,8 +159,14 @@ public class Player : MonoBehaviour
         // Calcular dirección hacia adelante a lo largo de la pared
         wallForward = Vector3.Cross(wallNormal, Vector3.up);
 
+        // Determinar la mejor dirección basada en la velocidad actual del jugador
+        Vector3 playerMovementDirection = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).normalized;
+
+        // Si el jugador se mueve, usar esa dirección; si no, usar la dirección hacia adelante del transform
+        Vector3 referenceDirection = playerMovementDirection.magnitude > 0.1f ? playerMovementDirection : transform.forward;
+
         // Asegurar que la dirección hacia adelante apunte correctamente
-        if (Vector3.Dot(wallForward, transform.forward) < 0)
+        if (Vector3.Dot(wallForward, referenceDirection) < 0)
             wallForward = -wallForward;
 
         // Reducir velocidad vertical si está cayendo
@@ -448,7 +251,7 @@ public class Player : MonoBehaviour
             anim.SetBool("Suelo", Saltar);
         }
 
-        
+
         /*
         anim.SetBool("WallRun", isWallRunning);
         anim.SetBool("WallRunLeft", isWallRunning && wallLeft);
@@ -465,25 +268,5 @@ public class Player : MonoBehaviour
     public bool IsWallRunning()
     {
         return isWallRunning;
-    }
-
-    // Método para debugging - puedes llamarlo desde el inspector
-    [System.Diagnostics.Conditional("UNITY_EDITOR")]
-    public void DebugWallRunState()
-    {
-        Debug.Log($"Wall Run State - Running: {isWallRunning}, Left: {wallLeft}, Right: {wallRight}, Timer: {wallRunTimer}");
-    }
-
-    // Visualización adicional en la escena
-    void OnDrawGizmos()
-    {
-        if (isWallRunning)
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawRay(transform.position, wallForward * 2f);
-
-            Gizmos.color = Color.red;
-            Gizmos.DrawRay(transform.position, wallNormal * 1f);
-        }
     }
 }
