@@ -8,7 +8,7 @@
   - Layers:
     - Default, TransparentFX, Ignore Raycast, Ground, Water, UI, Wall, escalera
 - Active game object:
-  - Name: mOnIgOtE
-  - Tag: Player
-  - Layer: Default
+  - Name: Platform
+  - Tag: Ground
+  - Layer: Ground
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
