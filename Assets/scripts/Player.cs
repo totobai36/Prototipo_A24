@@ -259,11 +259,11 @@ public class Player : MonoBehaviour
         */
     }
 
-    void EstoyCayendo()
+    /*void EstoyCayendo()
     {
         anim.SetBool("Suelo", false);
         anim.SetBool("Salto", false);
-    }
+    }*/
 
     public bool IsWallRunning()
     {
