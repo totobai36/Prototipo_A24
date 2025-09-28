@@ -314,6 +314,8 @@ MonoBehaviour:
   isFalling: 0
   enableFallDamage: 1
   deathHeight: -50
+  enableRespawn: 1
+  maxSafeFallDistance: 15
 --- !u!1 &169256668
 GameObject:
   m_ObjectHideFlags: 3
@@ -4108,6 +4110,22 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &460889056 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5161087776057180308, guid: 5e617f431d0585445b920e3876ee704c, type: 3}
+  m_PrefabInstance: {fileID: 674547328915549932}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 811aa8adb0423a04daaed172744350e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &460889061 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4404688250519611815, guid: 5e617f431d0585445b920e3876ee704c, type: 3}
+  m_PrefabInstance: {fileID: 674547328915549932}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &549534153
 GameObject:
   m_ObjectHideFlags: 0
@@ -6896,6 +6914,55 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1406025795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1406025796}
+  - component: {fileID: 1406025797}
+  m_Layer: 0
+  m_Name: RespawManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1406025796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1406025795}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 13.142961, y: 11.661752, z: 1.026281}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1406025797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1406025795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b337e577112b3c4c9b63a295f1fc7c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  respawnDelay: 2
+  timePenalty: 15
+  player: {fileID: 460889061}
+  fallDetector: {fileID: 460889056}
+  heightOffset: 0
 --- !u!1 &1440783808
 GameObject:
   m_ObjectHideFlags: 0
@@ -7520,7 +7587,7 @@ GameObject:
   - component: {fileID: 1710456794}
   - component: {fileID: 1710456793}
   - component: {fileID: 1710456792}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground2
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -8169,7 +8236,7 @@ GameObject:
   - component: {fileID: 1733915450}
   - component: {fileID: 1733915449}
   - component: {fileID: 1733915448}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -8864,6 +8931,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5161087776057180308, guid: 5e617f431d0585445b920e3876ee704c, type: 3}
+      propertyPath: enableRespawn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5161087776057180308, guid: 5e617f431d0585445b920e3876ee704c, type: 3}
+      propertyPath: maxSafeFallDistance
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5161087776057180308, guid: 5e617f431d0585445b920e3876ee704c, type: 3}
+      propertyPath: groundLayerMask.m_Bits
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9114,3 +9193,4 @@ SceneRoots:
   - {fileID: 6347220315668308970}
   - {fileID: 570672184}
   - {fileID: 7984731550481368827}
+  - {fileID: 1406025796}
