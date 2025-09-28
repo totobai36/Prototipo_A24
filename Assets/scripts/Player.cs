@@ -55,6 +55,8 @@ public class Player : MonoBehaviour
     private float wallRunCooldown = 0.5f;
     private float wallRunCooldownTimer = 0f;
 
+    public bool EnSuelo { get; internal set; }
+
     // ==========================
     // CICLO DE VIDA
     // ==========================
