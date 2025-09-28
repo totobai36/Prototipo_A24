@@ -183,15 +183,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 914a0b4cbc8ea8f4cadf10aca0e134e2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.0047922
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 914a0b4cbc8ea8f4cadf10aca0e134e2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.01
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 914a0b4cbc8ea8f4cadf10aca0e134e2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.62
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 914a0b4cbc8ea8f4cadf10aca0e134e2, type: 3}
       propertyPath: m_LocalRotation.w
@@ -345,13 +345,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidadMovimiento: 8
-  velocidadRotacion: 300
-  x: 0
-  y: 0
-  rb: {fileID: 7629619827717347713}
+  useCameraRelative: 1
+  cameraTransform: {fileID: 0}
+  rotateTowardsMove: 1
+  turnSpeed: 540
   fuerzaDeSalto: 8
   Saltar: 0
-  timer: 0
+  wallRunSpeed: 8
+  wallRunDuration: 3
+  wallJumpForce: 8
+  wallJumpSideForce: 5
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  wallCheckDistance: 1.2
+  wallRunGravity: 2
 --- !u!114 &5161087776057180308
 MonoBehaviour:
   m_ObjectHideFlags: 0
