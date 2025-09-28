@@ -287,7 +287,7 @@ public class Player : MonoBehaviour
         anim.SetFloat("VelX", x);
         anim.SetFloat("VelY", y);
         anim.SetBool("Suelo", Saltar);
-        // anim.SetBool("WallRun", isWallRunning); // si lo usás
+        anim.SetBool("Wall", isWallRunning); // si lo usás
     }
 
     // ==========================
