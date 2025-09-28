@@ -14,7 +14,6 @@ public class Player : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private float fuerzaDeSalto = 4f;
     public bool Saltar;
-    [SerializeField] private float timer = 4f;
 
     [Header("WallRun")]
     [SerializeField] private float wallRunSpeed = 8f;
@@ -23,9 +22,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float wallJumpSideForce = 5f;
     [SerializeField] private LayerMask wallLayer = -1;
     [SerializeField] private float wallCheckDistance = 1.2f;
-    [SerializeField] private float minWallRunHeight = 1f;
     [SerializeField] private float wallRunGravity = 2f; // Gravedad reducida durante wallrun
-    [SerializeField] private float minVelocityForWallRun = 2f;
 
     private bool isWallRunning = false;
     private Vector3 wallNormal;
@@ -37,7 +34,6 @@ public class Player : MonoBehaviour
     private float wallRunTimer = 0f;
 
     // Variables adicionales para mejorar el wallrun
-    private bool wasWallRunning = false;
     private float wallRunCooldown = 0.5f;
     private float wallRunCooldownTimer = 0f;
 
@@ -225,7 +221,6 @@ public class Player : MonoBehaviour
         if (isWallRunning)
         {
             isWallRunning = false;
-            wasWallRunning = true;
 
             // Pequeño cooldown para evitar re-enganche inmediato
             wallRunCooldownTimer = 0.2f;
