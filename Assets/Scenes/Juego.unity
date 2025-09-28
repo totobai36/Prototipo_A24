@@ -4214,8 +4214,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 345fe2967800cc24a9578a416f576f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadMaxima: 6
-  velocidadSprint: 10
+  velocidadMaxima: 8
+  velocidadSprint: 13
   aceleracionTerrestre: 150
   aceleracionAerea: 50
   friccionTerrestre: 10

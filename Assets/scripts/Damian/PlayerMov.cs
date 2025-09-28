@@ -346,19 +346,38 @@ public class PlayerMov : MonoBehaviour
     {
         if (!anim) return;
         
-        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-        Vector3 localVel = transform.InverseTransformDirection(flatVel);
+        // 1. Obtener la intención de movimiento del jugador
+        // Estas son las variables de input capturadas en Update()
+        float targetVelY = inputY; // Movimiento adelante/atrás
+        float targetVelX = inputX; // Movimiento lateral
         
-        float targetVelY = localVel.z;
-        float targetVelX = localVel.x;
+        // 2. Determinar si el jugador está en Sprint (para escalar la animación)
+        bool isMoving = inputX != 0 || inputY != 0;
+        // La condición de sprint debe ser la misma que usas en HandleMovement()
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift) && EnSuelo && isMoving && inputY >= 0f;
         
-        float smoothTime = EnSuelo ? 0.1f : 0.5f;
+        if (isSprinting)
+        {
+            // Escalar la velocidad para la animación de sprint. 
+            // Usa un valor mayor a 1.0 (ej. 2.0) si tu Blend Tree lo requiere.
+            targetVelY *= 2.0f; 
+        }
+        
+        // 3. Aplicar suavizado a las variables de animación
+        // Usa un 'smoothTime' bajo (0.05s - 0.1s) para una respuesta rápida en suelo.
+        float smoothTime = EnSuelo ? 0.08f : 0.2f; 
 
+        // Aplicamos los valores al Animator
+        // NOTA: Asegúrate que tus parámetros en Unity se llamen "VelY" y "VelX"
         anim.SetFloat("VelY", targetVelY, smoothTime, Time.deltaTime);
         anim.SetFloat("VelX", targetVelX, smoothTime, Time.deltaTime);
         
+        // Variables de estado
         anim.SetBool("Suelo", EnSuelo);
         
+        // Animación de caída (usa la velocidad vertical real)
+        anim.SetFloat("VelVertical", rb.linearVelocity.y);
+
         if (wallRunController != null)
         {
             anim.SetBool("Wall", wallRunController.IsWallRunning);
