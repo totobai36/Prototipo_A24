@@ -6,7 +6,11 @@ public class Pies : MonoBehaviour
     
     private void OnTriggerStay(Collider other)
     {
-        player.Saltar = true;
+        if (!player.IsWallRunning())
+        {
+            player.Saltar = true;
+        }
+        
     }
 
     private void OnTriggerExit(Collider other)
