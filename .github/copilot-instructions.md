@@ -6,9 +6,9 @@
   - Tags:
     - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ground, WallRun
   - Layers:
-    - Default, TransparentFX, Ignore Raycast, Ground, Water, UI
+    - Default, TransparentFX, Ignore Raycast, Ground, Water, UI, Wall, escalera
 - Active game object:
-  - Name: RespawManager
-  - Tag: Untagged
+  - Name: mOnIgOtE
+  - Tag: Player
   - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
