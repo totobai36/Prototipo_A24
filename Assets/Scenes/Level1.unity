@@ -628,9 +628,9 @@ GameObject:
   - component: {fileID: 59276010}
   - component: {fileID: 59276009}
   - component: {fileID: 59276008}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: finalWall3
-  m_TagString: Untagged
+  m_TagString: WallRun
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1655,15 +1655,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 392505042202670998, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.3688126
+      value: -31.477
       objectReference: {fileID: 0}
     - target: {fileID: 392505042202670998, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00009918213
+      value: 16.203
       objectReference: {fileID: 0}
     - target: {fileID: 392505042202670998, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 88.3
+      value: 0.132
       objectReference: {fileID: 0}
     - target: {fileID: 392505042202670998, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1703,7 +1703,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4514088601129043278, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: groundCheckDistance
-      value: 2
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 4514088601129043278, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: groundLayerMask.m_Bits
@@ -18161,7 +18161,7 @@ GameObject:
   - component: {fileID: 1455103667}
   m_Layer: 3
   m_Name: floorFinal
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
