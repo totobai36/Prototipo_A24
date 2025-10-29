@@ -1520,17 +1520,25 @@ PrefabInstance:
       propertyPath: fuerzaDeSalto
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 2218094368463019991, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4514088601129043278, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: groundCheckDistance
       value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 4514088601129043278, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: groundLayerMask.m_Bits
-      value: 9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5181823253382518327, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5181823253382518327, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
+      propertyPath: wallLayer.m_Bits
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
