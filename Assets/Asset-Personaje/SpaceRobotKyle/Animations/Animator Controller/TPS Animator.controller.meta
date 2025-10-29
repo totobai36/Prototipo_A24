@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d809c6d13cce8f04db8230a4717dc1cb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 151612
+  packageName: Climbing System
+  packageVersion: 5.1
+  assetPath: Assets/Asset-Personaje/SpaceRobotKyle/Animations/Animator Controller/TPS
+    Animator.controller
+  uploadId: 748778

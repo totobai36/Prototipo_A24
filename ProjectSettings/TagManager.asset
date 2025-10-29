@@ -4,17 +4,21 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Ground
-  - WallRun
+  - Ledge
+  - LedgeLimit
+  - Vault
+  - Mantle
+  - Ladder
+  - Teeter
+  - JumpDestination
+  - MovableGround
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - 
   - Water
   - UI
-  - Wall
-  - escalera
   - 
   - 
   - 
@@ -22,9 +26,11 @@ TagManager:
   - 
   - 
   - 
+  - Ragdoll
   - 
-  - 
-  - 
+  - Character
+  - Climb
+  - Wall Run
   - 
   - 
   - 
