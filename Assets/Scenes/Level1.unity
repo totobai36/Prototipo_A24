@@ -1746,11 +1746,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 811aa8adb0423a04daaed172744350e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &278895573 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 392505042202670998, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
-  m_PrefabInstance: {fileID: 278895571}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &293596679
 Mesh:
   m_ObjectHideFlags: 0
@@ -6065,7 +6060,7 @@ PrefabInstance:
     - target: {fileID: 5353136503159189823, guid: 29611539857564e4695cde86537810b6, type: 3}
       propertyPath: player
       value: 
-      objectReference: {fileID: 278895573}
+      objectReference: {fileID: 2019814378}
     - target: {fileID: 5353136503159189823, guid: 29611539857564e4695cde86537810b6, type: 3}
       propertyPath: fallDetector
       value: 
@@ -24698,6 +24693,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!4 &2019814378 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3996707596912034945, guid: 1c9d2133dfa30234e8e5d1ecc0e34876, type: 3}
+  m_PrefabInstance: {fileID: 276105686}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &2059988747
 Mesh:
   m_ObjectHideFlags: 0
