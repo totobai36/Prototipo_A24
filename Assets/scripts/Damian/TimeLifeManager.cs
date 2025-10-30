@@ -69,7 +69,20 @@ public class TimeLifeManager : MonoBehaviour
     void Update()
     {
         if (isTimerActive)
-            UpdateTimer();
+        {
+            currentTime -= Time.deltaTime;
+            OnTimerUpdated?.Invoke(currentTime);
+
+            // Verificar si el tiempo se agotó
+            if (currentTime <= 0.0f)
+            {
+                currentTime = 0.0f;
+                // Llama al evento OnGameOver, al que se suscribirá el GameStateManager.
+                GameOver(); 
+            }
+            if (isTimerActive)
+                UpdateTimer();
+        }
     }
 
     void UpdateTimer()
@@ -93,23 +106,19 @@ public class TimeLifeManager : MonoBehaviour
     }
 
     // StartTimer() activa el conteo. Si ya está activo, no reinicia por defecto.
-    public void StartTimer(bool resetIfAlreadyActive = false)
-    {
-        if (isTimerActive && !resetIfAlreadyActive)
-            return;
+public void StartTimer()
+{
+    if (isTimerActive) return;
+    isTimerActive = true;
+    OnTimerStart?.Invoke();
+    Debug.Log("Tiempo iniciado.");
+}
 
-        if (resetIfAlreadyActive)
-            currentTime = baseTime;
-
-        isTimerActive = true;
-        OnTimerStart?.Invoke();
-        Debug.Log("¡Timer iniciado! Tiempo restante: " + currentTime + "s");
-    }
-
-    public void StopTimer()
-    {
-        isTimerActive = false;
-    }
+   public void StopTimer()
+{
+    isTimerActive = false;
+    Debug.Log("Tiempo detenido.");
+}
 
     public void LoseTime(float timeToLose, Vector3 damagePosition = default)
     {

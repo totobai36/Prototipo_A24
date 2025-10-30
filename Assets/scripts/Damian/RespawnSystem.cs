@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using DiasGames.Components; // Necesario para acceder a MovementComponent, Ragdoll y otras interfaces
 
 public class RespawnSystem : MonoBehaviour
 {
@@ -8,10 +10,10 @@ public class RespawnSystem : MonoBehaviour
     
     [Header("Referencias")]
     [SerializeField] private Transform player;
-    [SerializeField] private FallDetector fallDetector;
+    [SerializeField] private FallDetector fallDetector; // Referencia al script que me permitiste modificar
     
     [Header("Configuración Simple")]
-    [SerializeField] private float heightOffset = 0.0f; // CERO - directamente en el suelo
+    [SerializeField] private float heightOffset = 0.0f; // Offset vertical para la posición segura
     
     private bool isRespawning = false;
     private Vector3 lastSafePosition;
@@ -34,129 +36,100 @@ public class RespawnSystem : MonoBehaviour
     
     void Start()
     {
-        // Buscar jugador
+        // Buscar jugador por Tag (debe tener la Tag "Player")
         if (player == null)
         {
             GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
             if (playerGO != null)
             {
                 player = playerGO.transform;
-                Debug.Log($"Jugador encontrado: {player.name}");
             }
         }
         
-        // Buscar FallDetector
+        // Buscar FallDetector en el jugador (si no está asignado)
         if (fallDetector == null && player != null)
         {
             fallDetector = player.GetComponent<FallDetector>();
         }
-        
-        // Establecer posición inicial
+
+        // Inicializar la posición segura
         if (player != null)
         {
-            lastSafePosition = player.position;
-            hasSafePosition = true;
-            Debug.Log($"Posición inicial establecida: {lastSafePosition}");
+            SetSafePosition(player.position);
         }
     }
-    
-    void Update()
+
+    // Método PÚBLICO para iniciar el Respawn (llamado por FallDetector)
+    public void Respawn()
     {
-        if (player == null || isRespawning) return;
-        
-        // Actualizar posición segura cuando está en el suelo
-        if (fallDetector != null && fallDetector.IsCurrentlyGrounded() && !fallDetector.IsCurrentlyFalling())
-        {
-            lastSafePosition = player.position;
-            hasSafePosition = true;
-        }
+        if (isRespawning || !hasSafePosition) return;
+
+        // Llamar a la corrutina de Respawn
+        StartCoroutine(PerformRespawn(lastSafePosition));
     }
-    
-    public void TriggerRespawn()
+
+    // Actualiza la última posición donde el personaje estaba seguro (ej. al tocar el suelo)
+    public void SetSafePosition(Vector3 position)
     {
-        if (isRespawning) 
-        {
-            Debug.Log("Respawn ya en proceso - ignorando");
-            return;
-        }
-        
-        Debug.Log("=== INICIANDO RESPAWN SIMPLE ===");
-        StartCoroutine(RespawnCoroutine());
+        lastSafePosition = position + Vector3.up * heightOffset;
+        hasSafePosition = true;
     }
-    
-    System.Collections.IEnumerator RespawnCoroutine()
+
+    private IEnumerator PerformRespawn(Vector3 respawnPosition)
     {
         isRespawning = true;
         
-        if (!hasSafePosition)
+        // --- 1. Obtener Componentes del Personaje ---
+        MovementComponent movementComponent = player.GetComponent<MovementComponent>(); // Componente Intocable
+        CharacterController charController = player.GetComponent<CharacterController>();  // Componente de Unity (asumido)
+        Ragdoll ragdoll = player.GetComponent<Ragdoll>(); // Componente Intocable
+
+        // --- 2. Desactivar Movimiento y Control ---
+        // Deshabilitamos el CharacterController y el script de lógica de movimiento
+        // para un teleport limpio y para detener la gravedad/física del jugador.
+        if (movementComponent != null)
         {
-            lastSafePosition = Vector3.zero;
+            movementComponent.enabled = false; 
+        }
+        if (charController != null)
+        {
+            charController.enabled = false;
         }
         
-        // FORZAR heightOffset a 0 si es muy grande
-        if (heightOffset > 1f)
-        {
-            heightOffset = 0.0f;
-            Debug.LogWarning("HeightOffset era demasiado grande, forzado a 0");
-        }
+        // Si por alguna razón el Ragdoll está activo, lo desactivamos 
+        // (asumiendo que tu Ragdoll.cs tiene un método público para hacerlo, 
+        // aunque tu snippet solo muestra `ActivateRagdoll()`).
+        // Si tu Ragdoll no tiene `DeactivateRagdoll()`, Unity lo maneja al reactivar el CharacterController.
         
-        // Calcular punto de respawn
-        Vector3 respawnPosition = lastSafePosition + Vector3.up * heightOffset;
-        
-        Debug.Log($"RESPAWN SIMPLE:");
-        Debug.Log($"- HeightOffset usado: {heightOffset}");
-        Debug.Log($"- Posición actual jugador: {player.position}");
-        Debug.Log($"- Última posición segura: {lastSafePosition}");
-        Debug.Log($"- Punto de respawn: {respawnPosition}");
-        
-        // Detener jugador
-        var rigidbody = player.GetComponent<Rigidbody>();
-        var playerController = player.GetComponent<CharacterController>();
-        
-        if (rigidbody != null)
-        {
-            rigidbody.linearVelocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
-            rigidbody.isKinematic = true;
-        }
-        
-        if (playerController != null)
-        {
-            playerController.enabled = false;
-        }
-        
-        // TELEPORTAR
+        // --- 3. TELEPORTAR ---
         player.position = respawnPosition;
-        Debug.Log($"Jugador teleportado a: {player.position}");
         
-        // Esperar
+        // --- 4. Esperar y Penalizar ---
         yield return new WaitForSeconds(respawnDelay);
         
-        // Penalización
+        // Aplicar Penalización de tiempo
         if (TimeLifeManager.Instance != null)
         {
             TimeLifeManager.Instance.LoseTime(timePenalty);
-            Debug.Log($"Penalización: -{timePenalty}s");
         }
         
-        // Reactivar
-        if (rigidbody != null)
+        // --- 5. Reactivar Componentes ---
+        if (charController != null)
         {
-            rigidbody.isKinematic = false;
+            charController.enabled = true;
         }
-        
-        if (playerController != null)
+        if (movementComponent != null)
         {
-            playerController.enabled = true;
+            movementComponent.enabled = true; // Reactiva la lógica del MovementComponent
         }
         
-        // Resetear flag
+        // --- 6. Finalizar Respawn ---
         if (fallDetector != null)
         {
-            fallDetector.ResetRespawnFlag();
+            // Llama al método que agregamos a FallDetector para que pueda volver a detectar caídas.
+            fallDetector.ResetRespawnFlag(); 
         }
         
-        Debug.Log("=== RESPAWN COMPLETADO ===");
         isRespawning = false;
     }
     
@@ -170,9 +143,7 @@ public class RespawnSystem : MonoBehaviour
         if (hasSafePosition)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(lastSafePosition + Vector3.up * heightOffset, 0.5f);
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube(lastSafePosition, Vector3.one * 0.3f);
+            Gizmos.DrawWireSphere(lastSafePosition, 0.5f);
         }
     }
 }

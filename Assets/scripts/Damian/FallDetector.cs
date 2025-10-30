@@ -27,114 +27,78 @@ public class FallDetector : MonoBehaviour
         {
             Debug.LogError("FallDetector necesita un Rigidbody en el jugador");
         }
+        
+        // Inicializar la última posición segura al comienzo
+        if (RespawnSystem.Instance != null)
+        {
+            RespawnSystem.Instance.SetSafePosition(transform.position);
+        }
     }
 
-    [System.Obsolete]
     void Update()
     {
         CheckGrounded();
         
-        // SOLO verificar death height si no estamos en proceso de respawn
-        if (!RespawnSystem.Instance || !RespawnSystem.Instance.IsRespawning())
+        // Solo verificar death height si el RespawnSystem no está en proceso de respawn
+        if (RespawnSystem.Instance == null || !RespawnSystem.Instance.IsRespawning())
         {
-            CheckDeathHeight();
+            CheckDeathHeight(); 
         }
     }
 
-    [System.Obsolete]
     void CheckGrounded()
     {
-        bool wasGrounded = isGrounded;
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayerMask);
-        
-        // RESETEAR FLAG solo cuando esté completamente en el suelo Y no cayendo
-        if (isGrounded && !isFalling)
-        {
-            hasTriggeredRespawn = false;
-            //Debug.Log("Flag de respawn reseteado - jugador en suelo seguro");
-        }
-        
-        // Comenzar a caer
-        if (wasGrounded && !isGrounded && !isFalling)
-        {
-            StartFalling();
-        }
-        
-        // Aterrizar
-        if (!wasGrounded && isGrounded && isFalling)
-        {
-            Landing();
-        }
-    }
-    
-    void StartFalling()
-    {
-        isFalling = true;
-        fallStartHeight = transform.position.y;
-        Debug.Log($"Iniciando caída desde altura: {fallStartHeight}");
-    }
+        // Usamos una simple Raycast para este ejemplo:
+        bool nowGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayerMask);
 
-    [System.Obsolete]
-    void Landing()
-    {
-        isFalling = false;
-        float fallDistance = fallStartHeight - transform.position.y;
-        
-        Debug.Log($"Aterrizaje - Distancia de caída: {fallDistance}m");
-        
-        // Verificar si debe activar respawn por caída mortal
-        float potentialDamage = CalculateFallDamage(fallDistance);
-        bool wouldCauseDeath = TimeLifeManager.Instance != null && 
-                              potentialDamage >= TimeLifeManager.Instance.CurrentTime;
-        
-        if (enableRespawn && RespawnSystem.Instance != null && 
-            fallDistance > maxSafeFallDistance && wouldCauseDeath && !hasTriggeredRespawn)
+        if (nowGrounded && !isGrounded)
         {
-            Debug.Log($"CAÍDA MORTAL POR DISTANCIA: {fallDistance}m (>{maxSafeFallDistance}m) causaría {potentialDamage}s de daño");
-            hasTriggeredRespawn = true;
-            RespawnSystem.Instance.TriggerRespawn();
-        }
-        else if (enableFallDamage && TimeLifeManager.Instance != null)
-        {
-            // Caída normal - aplicar daño
-            TimeLifeManager.Instance.ProcessFallDamage(fallDistance);
-        }
-    }
-    
-    float CalculateFallDamage(float fallDistance)
-    {
-        if (fallDistance < 3f) return 0f;
-        return (fallDistance - 3f) * 2f;
-    }
-
-    [System.Obsolete]
-    void CheckDeathHeight()
-    {
-        if (transform.position.y < deathHeight && !hasTriggeredRespawn)
-        {
-            Debug.Log($"CAÍDA MORTAL POR ALTURA: Y={transform.position.y} < {deathHeight}");
-            hasTriggeredRespawn = true;
-            
-            if (enableRespawn && RespawnSystem.Instance != null)
+            isGrounded = true;
+            if (isFalling && enableFallDamage)
             {
-                Debug.Log("Activando respawn por caída al vacío");
-                RespawnSystem.Instance.TriggerRespawn();
-            }
-            else
-            {
-                Debug.LogError($"No se puede activar respawn: enableRespawn={enableRespawn}, RespawnSystem.Instance={RespawnSystem.Instance != null}");
-                
-                // Muerte instantánea
+                float totalFallDistance = fallStartHeight - transform.position.y;
                 if (TimeLifeManager.Instance != null)
                 {
-                    TimeLifeManager.Instance.LoseTime(TimeLifeManager.Instance.CurrentTime);
+                    TimeLifeManager.Instance.ProcessFallDamage(totalFallDistance);
                 }
-                Debug.Log("Muerte instantánea por caída al vacío");
             }
+            isFalling = false;
+            // Al aterrizar, actualizamos la posición segura
+            if (RespawnSystem.Instance != null)
+            {
+                RespawnSystem.Instance.SetSafePosition(transform.position);
+            }
+        }
+        else if (!nowGrounded && isGrounded)
+        {
+            isGrounded = false;
+            isFalling = true;
+            fallStartHeight = transform.position.y;
+        }
+    }
+
+    void CheckDeathHeight()
+    {
+        if (transform.position.y < deathHeight)
+        {
+            // --- CORRECCIÓN LÍNEA 95 ---
+            if (enableRespawn && RespawnSystem.Instance != null && !hasTriggeredRespawn)
+            {
+                // Aseguramos la llamada al método público correcto: Respawn()
+                RespawnSystem.Instance.Respawn(); 
+                hasTriggeredRespawn = true; 
+            }
+            else if (!enableRespawn && TimeLifeManager.Instance != null)
+            {
+                // Muerte instantánea si no hay respawn
+                TimeLifeManager.Instance.LoseTime(TimeLifeManager.Instance.CurrentTime);
+            }
+            Debug.Log("Muerte instantánea por caída al vacío");
         }
     }
     
-    // NUEVO MÉTODO para resetear el flag externamente
+    // --- CORRECCIÓN LÍNEA 159 ---
+    // Este método es necesario para que RespawnSystem restablezca la lógica de caída.
     public void ResetRespawnFlag()
     {
         hasTriggeredRespawn = false;
@@ -157,14 +121,4 @@ public class FallDetector : MonoBehaviour
     public bool IsCurrentlyGrounded() => isGrounded;
     public bool IsCurrentlyFalling() => isFalling;
     public float GetCurrentFallDistance() => isFalling ? fallStartHeight - transform.position.y : 0f;
-
-    [System.Obsolete]
-    public void ForceRespawn()
-    {
-        if (enableRespawn && RespawnSystem.Instance != null && !hasTriggeredRespawn)
-        {
-            hasTriggeredRespawn = true;
-            RespawnSystem.Instance.TriggerRespawn();
-        }
-    }
 }

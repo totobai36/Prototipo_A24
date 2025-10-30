@@ -29,14 +29,22 @@ public class Switch : MonoBehaviour
         }
     }
 
-    void ActivateSwitch()
-    {
-        isActivated = true;
-        PlaySwitchEffects();
+void ActivateSwitch()
+{
+    isActivated = true;
+    PlaySwitchEffects();
 
-        OnSwitchActivated?.Invoke();
-        Debug.Log("Switch activado - notificando a otros sistemas");
+    OnSwitchActivated?.Invoke();
+    Debug.Log("Switch activado - notificando a otros sistemas");
+    
+    // =======================================================
+    // NUEVA LÍNEA: Inicia el contador de tiempo al activarse
+    // =======================================================
+    if (TimeLifeManager.Instance != null)
+    {
+        TimeLifeManager.Instance.StartTimer(); 
     }
+}
 
     void PlaySwitchEffects()
     {

@@ -1,14 +1,14 @@
 <!-- UNITY CODE ASSIST INSTRUCTIONS START -->
 - Project name: Prototipo_A24
-- Unity version: Unity 6000.0.58f1
+- Unity version: Unity 6000.0.60f1
 - Active scene:
-  - Name: Juego
+  - Name: Level1
   - Tags:
-    - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ground, WallRun
+    - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ledge, LedgeLimit, Vault, Mantle, Ladder, Teeter, JumpDestination, MovableGround, WallRun, Ground
   - Layers:
-    - Default, TransparentFX, Ignore Raycast, Ground, Water, UI, Wall, escalera
+    - Default, TransparentFX, Ignore Raycast, Water, UI, Ragdoll, Character, Climb, Wall Run
 - Active game object:
-  - Name: mOnIgOtE
+  - Name: Climbing Character - Rigidbody Variant
   - Tag: Player
-  - Layer: Default
+  - Layer: Character
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

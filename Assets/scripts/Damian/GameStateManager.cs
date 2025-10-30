@@ -31,22 +31,32 @@ public class GameStateManager : MonoBehaviour
   
     }
 
-    void Start()
+void Start()
 {
     // Suscripción al Switch
     if (mainSwitch != null)
     {
         mainSwitch.OnSwitchActivated.AddListener(OnSwitchActivated);
-        Debug.Log("Suscripción al Switch realizada con éxito."); // Agrega este log para confirmar
+        Debug.Log("Suscripción al Switch realizada con éxito."); 
     }
     else
     {
         Debug.LogError("ERROR: La referencia 'mainSwitch' está vacía en el GameStateManager.");
     }
-
-    // TimeLifeManager: asume que su Awake() ya asignó la Instance
-    if (TimeLifeManager.Instance != null)
-        TimeLifeManager.Instance.OnGameOver.AddListener(OnGameOver);
+    
+    // =======================================================
+    // NUEVA SUSCRIPCIÓN: Escucha el GAME OVER del TimeLifeManager
+    // =======================================================
+    TimeLifeManager timeManager = FindFirstObjectByType<TimeLifeManager>();
+    if (timeManager != null)
+    {
+        timeManager.OnGameOver.AddListener(OnGameOver); 
+        Debug.Log("Suscripción al evento OnGameOver de TimeLifeManager.");
+    }
+    else
+    {
+        Debug.LogError("TimeLifeManager no encontrado para la suscripción de OnGameOver.");
+    }
 }
 
 void OnDestroy() // Usamos OnDestroy en lugar de OnDisable para Singletons con DontDestroyOnLoad
