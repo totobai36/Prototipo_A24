@@ -4,11 +4,11 @@
 - Active scene:
   - Name: Level1
   - Tags:
-    - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ledge, LedgeLimit, Vault, Mantle, Ladder, Teeter, JumpDestination, MovableGround, WallRun, Ground
+    - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ledge, LedgeLimit, Vault, Mantle, Ladder, Teeter, JumpDestination, MovableGround, WallRun
   - Layers:
     - Default, TransparentFX, Ignore Raycast, Water, UI, Ragdoll, Character, Climb, Wall Run
 - Active game object:
-  - Name: Climbing Character - Rigidbody Variant
-  - Tag: Player
-  - Layer: Character
+  - Name: One Point Ledge
+  - Tag: Untagged
+  - Layer: Climb
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
