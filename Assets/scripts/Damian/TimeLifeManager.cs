@@ -5,10 +5,14 @@ using System.Collections;
 [RequireComponent(typeof(AudioSource))]
 public class TimeLifeManager : MonoBehaviour
 {
+    public static TimeLifeManager Instance { get; private set; }
+
     [Header("Configuración de Tiempo")]
     [SerializeField] private float baseTime = 90f;
     [SerializeField] private float currentTime;
     [SerializeField] private bool isTimerActive = false;
+    // NUEVO: Tiempo de espera entre Game Over (Ragdoll) y la carga de escena.
+    [SerializeField] private float gameOverDelay = 1.0f; 
 
     [Header("Pérdida de Tiempo")]
     [SerializeField] private float fallDamagePerMeter = 2f;
@@ -37,11 +41,12 @@ public class TimeLifeManager : MonoBehaviour
     // Propiedades públicas
     public float CurrentTime => currentTime;
     public float BaseTime => baseTime;
+    public float TimePercentage => baseTime > 0 ? currentTime / baseTime : 0f;
     public bool IsTimerActive => isTimerActive;
-    public float TimePercentage => baseTime <= 0 ? 0f : currentTime / baseTime;
+    
+    // Flag para evitar múltiples llamadas a la corrutina de Game Over
+    private bool isGameOverProcessing = false; 
 
-    // Singleton
-    public static TimeLifeManager Instance { get; private set; }
 
     void Awake()
     {
@@ -49,21 +54,31 @@ public class TimeLifeManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            currentTime = baseTime;
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
+    }
 
-        currentTime = baseTime;
+    public void StartTimer()
+    {
+        if (!isTimerActive)
+        {
+            isTimerActive = true;
+            OnTimerStart?.Invoke();
+            Debug.Log("Temporizador iniciado.");
+        }
+    }
 
-        OnTimerStart = OnTimerStart ?? new UnityEvent();
-        OnTimeLoss = OnTimeLoss ?? new UnityEvent();
-        OnTimeGain = OnTimeGain ?? new UnityEvent();
-        OnGameOver = OnGameOver ?? new UnityEvent();
-        OnCriticalTime = OnCriticalTime ?? new UnityEvent();
-        OnTimerUpdated = OnTimerUpdated ?? new UnityEvent<float>();
+    public void StopTimer()
+    {
+        if (isTimerActive)
+        {
+            isTimerActive = false;
+            Debug.Log("Temporizador detenido.");
+        }
     }
 
     void Update()
@@ -72,79 +87,116 @@ public class TimeLifeManager : MonoBehaviour
         {
             currentTime -= Time.deltaTime;
             OnTimerUpdated?.Invoke(currentTime);
-
-            // Verificar si el tiempo se agotó
-            if (currentTime <= 0.0f)
+            
+            // Lógica para el umbral de tiempo crítico
+            if (currentTime <= baseTime * redThreshold && currentTime > 0)
             {
-                currentTime = 0.0f;
-                // Llama al evento OnGameOver, al que se suscribirá el GameStateManager.
-                GameOver(); 
+                OnCriticalTime?.Invoke();
             }
-            if (isTimerActive)
-                UpdateTimer();
+
+            if (currentTime <= 0)
+            {
+                currentTime = 0; // CORRECCIÓN CLAVE: Asegura que el tiempo nunca es negativo
+                GameOver();
+            }
         }
     }
 
-    void UpdateTimer()
+    public void LoseTime(float timeToLose, Vector3? damagePosition = null)
     {
-        float prev = currentTime;
-        currentTime -= Time.deltaTime;
+        if (!isTimerActive || isGameOverProcessing) return;
 
-        if (currentTime <= 10f && prev > 10f)
-        {
-            OnCriticalTime?.Invoke();
-        }
-
-        if (currentTime <= 0f)
-        {
-            currentTime = 0f;
-            GameOver();
-        }
-
-        // Emitir actualización para UI cada frame
-        OnTimerUpdated?.Invoke(currentTime);
-    }
-
-    // StartTimer() activa el conteo. Si ya está activo, no reinicia por defecto.
-public void StartTimer()
-{
-    if (isTimerActive) return;
-    isTimerActive = true;
-    OnTimerStart?.Invoke();
-    Debug.Log("Tiempo iniciado.");
-}
-
-   public void StopTimer()
-{
-    isTimerActive = false;
-    Debug.Log("Tiempo detenido.");
-}
-
-    public void LoseTime(float timeToLose, Vector3 damagePosition = default)
-    {
-        if (timeToLose <= 0) return;
-
-        currentTime = Mathf.Max(0, currentTime - timeToLose);
+        currentTime -= timeToLose;
         OnTimeLoss?.Invoke();
         OnTimerUpdated?.Invoke(currentTime);
 
-        Debug.Log($"Tiempo perdido: {timeToLose}s. Tiempo restante: {currentTime}s");
-
-        if (currentTime <= 0f)
+        if (currentTime <= 0)
+        {
+            currentTime = 0;
             GameOver();
+        }
+        
+        Debug.Log($"Tiempo perdido: {timeToLose}s. Tiempo restante: {currentTime}s");
     }
 
     public void GainTime(float timeToGain)
     {
-        if (timeToGain <= 0) return;
+        if (!isTimerActive || isGameOverProcessing) return;
 
-        currentTime = Mathf.Min(baseTime, currentTime + timeToGain);
+        currentTime += timeToGain;
+        if (currentTime > baseTime)
+        {
+            currentTime = baseTime;
+        }
+
         OnTimeGain?.Invoke();
         OnTimerUpdated?.Invoke(currentTime);
 
         Debug.Log($"Tiempo ganado: {timeToGain}s. Tiempo restante: {currentTime}s");
     }
 
+    // --- NUEVA LÓGICA DE GAME OVER CON DELAY ---
+    void GameOver()
+    {
+        // 1. Prevenir ejecuciones duplicadas.
+        if (isGameOverProcessing) return; 
+        
+        isTimerActive = false;
+        isGameOverProcessing = true; // Activar el flag de proceso
+
+        // 2. Notifica a los suscriptores (ej: CharacterDeathHandler para el Ragdoll)
+        // El ragdoll/animación se activa INMEDIATAMENTE.
+        OnGameOver?.Invoke(); 
+        
+        Debug.Log("GAME OVER: Tiempo agotado. Activando animación y esperando para cargar la escena...");
+
+        // 3. Inicia la Coroutine que ESPERARÁ y luego cargará la escena de derrota.
+        StartCoroutine(ProcessGameOverWithDelay(gameOverDelay)); // Usa la variable de 1.0s
+    }
+
+    private IEnumerator ProcessGameOverWithDelay(float delay)
+    {
+        // Espera el delay (1 segundo) para que se vea la animación inicial
+        yield return new WaitForSeconds(delay);
+
+        // Notificar al GameStateManager para la carga de escena de Derrota
+        if (GameStateManager.Instance != null)
+        {
+            // Nota: Se asume que GameStateManager.Instance.OnGameOver() es público
+            // y contiene la llamada a SceneManager.LoadScene("Derrota").
+            GameStateManager.Instance.OnGameOver();
+        }
+        else
+        {
+            Debug.LogError("GameStateManager.Instance no encontrado. La escena de derrota no se puede cargar.");
+        }
+        
+        // El objeto TimeLifeManager será destruido con la carga de la escena.
+    }
+    // --- FIN NUEVA LÓGICA DE GAME OVER CON DELAY ---
+
+
+    public void ResetTimer()
+    {
+        currentTime = baseTime;
+        isTimerActive = false;
+        OnTimerUpdated?.Invoke(currentTime);
+    }
+
+    public void FreezeTime(float duration)
+    {
+        StartCoroutine(FreezeTimerCoroutine(duration));
+    }
+
+    IEnumerator FreezeTimerCoroutine(float duration)
+    {
+        bool wasActive = isTimerActive;
+        isTimerActive = false;
+        yield return new WaitForSeconds(duration);
+        isTimerActive = wasActive;
+    }
+    
+    // Métodos de daño (dejados para referencia)
     public void ProcessFallDamage(float fallDistance)
     {
         if (fallDistance >= minFallHeight)
@@ -168,35 +220,5 @@ public void StartTimer()
             return yellowColor;
         else
             return redColor;
-    }
-
-    void GameOver()
-    {
-        isTimerActive = false;
-        OnGameOver?.Invoke();
-        Debug.Log("GAME OVER - Desconexión");
-    }
-
-    public void ResetTimer()
-    {
-        currentTime = baseTime;
-        isTimerActive = false;
-        OnTimerUpdated?.Invoke(currentTime);
-    }
-
-    public void FreezeTime(float duration)
-    {
-        StartCoroutine(FreezeTimerCoroutine(duration));
-    }
-
-    IEnumerator FreezeTimerCoroutine(float duration)
-    {
-        bool wasActive = isTimerActive;
-        isTimerActive = false;
-
-        yield return new WaitForSeconds(duration);
-
-        isTimerActive = wasActive;
-        Debug.Log($"Tiempo congelado por {duration}s");
     }
 }
