@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec19897826cc69b43b6b25ff1e6f919e, type: 3}
+  m_Name: StandardEnemy
+  m_EditorClassIdentifier: 
+  wanderInZone: 0
+  wanderSpeed: 1
+  wanderRadius: 3
+  wanderChangeInterval: 5
+  chaseSpeed: 5
+  detectionRange: 15
+  losePlayerRange: 25
+  returnToZoneDelay: 3
+  timeDamage: 10
+  attackCooldown: 2
+  attackRange: 1.5
+  idleColor: {r: 0, g: 1, b: 0, a: 1}
+  chaseColor: {r: 1, g: 0, b: 0, a: 1}
+  attackColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  movementForceMultiplier: 10
+  rotationSpeed: 5
