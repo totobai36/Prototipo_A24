@@ -6060,6 +6060,10 @@ PrefabInstance:
       propertyPath: fallDetector
       value: 
       objectReference: {fileID: 2019814380}
+    - target: {fileID: 5353136503159189823, guid: 29611539857564e4695cde86537810b6, type: 3}
+      propertyPath: respawnDelay
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 5995759479723872704, guid: 29611539857564e4695cde86537810b6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 13.142961
