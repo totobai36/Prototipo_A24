@@ -8,6 +8,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Dias Games/Climbing System/Scenes/Featured Gameplay Scene.unity
     guid: 2558f861aef28d64ebe62b69c46f3b82
+  - enabled: 1
+    path: Assets/Scenes/Inicio.unity
+    guid: f918cca806883704e9664fc5caaa6a72
+  - enabled: 1
+    path: Assets/Scenes/Level1.unity
+    guid: 33a3503641d3a4046a75f6e867c7174d
+  - enabled: 1
+    path: Assets/Scenes/Victoria.unity
+    guid: 7ba7c621c29b04445ad0b7c1db30a796
+  - enabled: 1
+    path: Assets/Scenes/Derrota.unity
+    guid: 57381cc3d01759e46803f20bf9535201
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 624aa4ccdde53784f90f7352c46c1931, type: 2}
   m_UseUCBPForAssetBundles: 0
