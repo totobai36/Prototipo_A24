@@ -15,12 +15,12 @@ public class Pausa : MonoBehaviour
 
     void Update()
     {
-        if (activo == false && Keyboard.current.enterKey.wasPressedThisFrame)
+        if (activo == false && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             Pausar();
             activo = true;
         }
-        else if (activo == true && Keyboard.current.enterKey.wasPressedThisFrame)
+        else if (activo == true && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             Reanudar(); 
             activo = false;
