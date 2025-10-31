@@ -1716,6 +1716,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3402924330642029495, guid: 415bd1bbd60d8e94fb0e5612ddbcb542, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6347843811241614282, guid: 415bd1bbd60d8e94fb0e5612ddbcb542, type: 3}
       propertyPath: m_Name
       value: Main Camera  - Fixed Update Variant
@@ -1846,6 +1850,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4679680603064973608, guid: 1c9d2133dfa30234e8e5d1ecc0e34876, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: -115542043252710351, guid: c6913278fad90014ba6e79afc4964c92, type: 2}
     - target: {fileID: 4681333937547395198, guid: 1c9d2133dfa30234e8e5d1ecc0e34876, type: 3}
       propertyPath: m_LocalPosition.x
       value: 28.650179
@@ -1882,6 +1890,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
       objectReference: {fileID: 2100000, guid: eed8a0231ffb6ae42a98a1935a16a629, type: 2}
+    - target: {fileID: 8195702670750403668, guid: 1c9d2133dfa30234e8e5d1ecc0e34876, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: -115542043252710351, guid: c6913278fad90014ba6e79afc4964c92, type: 2}
     - target: {fileID: 8312696492330345328, guid: 1c9d2133dfa30234e8e5d1ecc0e34876, type: 3}
       propertyPath: m_LocalPosition.x
       value: 28.500177
@@ -2341,6 +2353,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5181823253382518327, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
       propertyPath: wallLayer.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6110126044072041317, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8443727098032152670, guid: 5a28e84b6dff0fc4e99a9325b796f13d, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -23729,6 +23749,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3315826662311860185, guid: 1de3facf74d072246bfb3120816ec489, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6423717732517836708, guid: 1de3facf74d072246bfb3120816ec489, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7282852313522787269, guid: 1de3facf74d072246bfb3120816ec489, type: 3}
