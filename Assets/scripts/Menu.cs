@@ -2,24 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class VD : MonoBehaviour
 {
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Keyboard.current.enterKey.wasPressedThisFrame)
         {
             Accept();
         }
-        else if (SceneManager.GetActiveScene().name == "Derrota" && Input.GetKeyDown(KeyCode.Space))
+        else if (SceneManager.GetActiveScene().name == "Derrota" && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             Reboot();
         }
-
     }
+
     public void Reboot()
     {
-        SceneManager.LoadScene("Juego");
+        SceneManager.LoadScene("Level1");
     }
 
     public void Accept()
@@ -29,7 +30,7 @@ public class VD : MonoBehaviour
 
     public void Play()
     {
-        SceneManager.LoadScene("Juego");
+        SceneManager.LoadScene("Level1");
     }
 
     public void Salir()
