@@ -16,13 +16,13 @@ MonoBehaviour:
   wanderSpeed: 1
   wanderRadius: 3
   wanderChangeInterval: 5
-  chaseSpeed: 4.5
+  chaseSpeed: 5
   detectionRange: 15
   losePlayerRange: 25
   returnToZoneDelay: 3
-  timeDamage: 30
+  timeDamage: 10
   attackCooldown: 2
-  attackRange: 2.75
+  attackRange: 1.5
   idleColor: {r: 0, g: 1, b: 0, a: 1}
   chaseColor: {r: 1, g: 0, b: 0, a: 1}
   attackColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
