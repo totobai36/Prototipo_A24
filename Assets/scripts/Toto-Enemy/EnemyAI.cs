@@ -1,18 +1,18 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
+[RequireComponent(typeof(Rigidbody))]
 public class EnemyAI : MonoBehaviour
 {
-    [Header("ConfiguraciÛn del Enemigo")]
+    [Header("Configuraci√≥n del Enemigo")]
     [SerializeField] private EnemyConfig config;
 
     [Header("Referencias")]
     [SerializeField] private Transform player;
     [SerializeField] private TimeLifeManager timeManager;
 
-    [Header("ConfiguraciÛn de Zona")]
-    [Tooltip("Define los lÌmites de la zona donde el enemigo est· activo. Usa al menos 3 puntos para crear un ·rea.")]
+    [Header("Configuraci√≥n de Zona")]
+    [Tooltip("Define los l√≠mites de la zona donde el enemigo est√° activo. Usa al menos 3 puntos para crear un √°rea.")]
     [SerializeField] private Transform[] zonePoints;
 
     // Estado del enemigo
@@ -39,31 +39,31 @@ public class EnemyAI : MonoBehaviour
                         RigidbodyConstraints.FreezeRotationZ;
         rb.useGravity = true;
 
-        // Guardar posiciÛn inicial
+        // Guardar posici√≥n inicial
         spawnPosition = transform.position;
         wanderTarget = spawnPosition;
 
-        // Buscar referencias autom·ticamente si no est·n asignadas
+        // Buscar referencias autom√°ticamente si no est√°n asignadas
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 player = playerObj.transform;
             else
-                Debug.LogError("EnemyAI: No se encontrÛ el jugador. Aseg˙rate de que tenga el tag 'Player'");
+                Debug.LogError("EnemyAI: No se encontr√≥ el jugador. Aseg√∫rate de que tenga el tag 'Player'");
         }
 
         if (timeManager == null)
         {
             timeManager = TimeLifeManager.Instance;
             if (timeManager == null)
-                Debug.LogError("EnemyAI: No se encontrÛ TimeLifeManager en la escena");
+                Debug.LogError("EnemyAI: No se encontr√≥ TimeLifeManager en la escena");
         }
 
-        // Validar configuraciÛn
+        // Validar configuraci√≥n
         if (config == null)
         {
-            Debug.LogError("EnemyAI: No se asignÛ un EnemyConfig. Asigna uno en el Inspector.");
+            Debug.LogError("EnemyAI: No se asign√≥ un EnemyConfig. Asigna uno en el Inspector.");
             enabled = false;
             return;
         }
@@ -71,9 +71,10 @@ public class EnemyAI : MonoBehaviour
         // Validar zona
         if (zonePoints == null || zonePoints.Length < 3)
         {
-            Debug.LogWarning("EnemyAI: Se necesitan al menos 3 puntos para definir una zona. El enemigo usar· detecciÛn de rango simple.");
+            Debug.LogWarning("EnemyAI: Se necesitan al menos 3 puntos para definir una zona. El enemigo usar√° detecci√≥n de rango simple.");
         }
 
+        lastAttackTime = -config.attackCooldown - 1f;
         UpdateVisuals();
     }
 
@@ -84,7 +85,7 @@ public class EnemyAI : MonoBehaviour
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         bool playerInZone = IsPlayerInZone();
 
-        // M·quina de estados
+        // M√°quina de estados
         switch (currentState)
         {
             case EnemyState.Idle:
@@ -128,7 +129,7 @@ public class EnemyAI : MonoBehaviour
 
     void HandleIdleState(float distanceToPlayer, bool playerInZone)
     {
-        // Solo perseguir si el jugador est· en la zona Y dentro del rango de detecciÛn
+        // Solo perseguir si el jugador est√° en la zona Y dentro del rango de detecci√≥n
         if (playerInZone && distanceToPlayer <= config.detectionRange)
         {
             currentState = EnemyState.Chase;
@@ -149,14 +150,14 @@ public class EnemyAI : MonoBehaviour
 
     void HandleChaseState(float distanceToPlayer, bool playerInZone)
     {
-        // Cambiar a ataque si est· lo suficientemente cerca
+        // Cambiar a ataque si est√° lo suficientemente cerca
         if (distanceToPlayer <= config.attackRange)
         {
             currentState = EnemyState.Attack;
             return;
         }
 
-        // Dejar de perseguir si el jugador sale de la zona o est· muy lejos
+        // Dejar de perseguir si el jugador sale de la zona o est√° muy lejos
         if (!playerInZone || distanceToPlayer > config.losePlayerRange)
         {
             currentState = EnemyState.Returning;
@@ -176,7 +177,7 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        // Atacar si el cooldown terminÛ
+        // Atacar si el cooldown termin√≥
         if (canAttack && Time.time >= lastAttackTime + config.attackCooldown)
         {
             AttackPlayer();
@@ -208,7 +209,7 @@ public class EnemyAI : MonoBehaviour
         Vector3 zoneCenter = GetZoneCenter();
         MoveTowards(zoneCenter, config.wanderSpeed);
 
-        // Si llegÛ cerca del centro, parar
+        // Si lleg√≥ cerca del centro, parar
         if (Vector3.Distance(transform.position, zoneCenter) < 2f)
         {
             currentState = EnemyState.Idle;
@@ -225,18 +226,18 @@ public class EnemyAI : MonoBehaviour
 
         if (wanderTimer <= 0f)
         {
-            // Elegir nuevo punto aleatorio cerca de la posiciÛn actual
+            // Elegir nuevo punto aleatorio cerca de la posici√≥n actual
             Vector2 randomCircle = Random.insideUnitCircle * config.wanderRadius;
             Vector3 randomPoint = transform.position + new Vector3(randomCircle.x, 0, randomCircle.y);
 
-            // Asegurarse de que estÈ dentro de la zona
+            // Asegurarse de que est√© dentro de la zona
             if (IsPointInZone(randomPoint))
             {
                 wanderTarget = randomPoint;
             }
             else
             {
-                // Si no est· en la zona, moverse hacia el centro
+                // Si no est√° en la zona, moverse hacia el centro
                 wanderTarget = GetZoneCenter();
             }
 
@@ -262,8 +263,14 @@ public class EnemyAI : MonoBehaviour
 
         if (timeManager != null)
         {
+            Debug.Log($"¬°ATACANDO! Timer activo: {timeManager.IsTimerActive}, Tiempo actual: {timeManager.CurrentTime}");
+
             timeManager.LoseTime(config.timeDamage, transform.position);
             StartCoroutine(AttackCooldownVisual());
+        }
+        else
+        {
+            Debug.LogError("TimeLifeManager es null!");
         }
     }
 
@@ -282,7 +289,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (player == null) return false;
 
-        // Si no hay puntos de zona definidos, usar detecciÛn por rango simple
+        // Si no hay puntos de zona definidos, usar detecci√≥n por rango simple
         if (zonePoints == null || zonePoints.Length < 3)
         {
             return Vector3.Distance(transform.position, player.position) <= config.losePlayerRange;
@@ -295,7 +302,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (zonePoints == null || zonePoints.Length < 3) return true;
 
-        // Algoritmo de Ray Casting para verificar si un punto est· dentro de un polÌgono
+        // Algoritmo de Ray Casting para verificar si un punto est√° dentro de un pol√≠gono
         int intersections = 0;
 
         for (int i = 0; i < zonePoints.Length; i++)
@@ -316,7 +323,7 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        // Si hay un n˙mero impar de intersecciones, el punto est· dentro
+        // Si hay un n√∫mero impar de intersecciones, el punto est√° dentro
         return (intersections % 2) == 1;
     }
 
@@ -371,6 +378,7 @@ public class EnemyAI : MonoBehaviour
         if (direction.magnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
+            targetRotation *= Quaternion.Euler(0, 180, 0);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * config.rotationSpeed);
         }
     }
@@ -409,10 +417,11 @@ public class EnemyAI : MonoBehaviour
             if (canAttack && Time.time >= lastAttackTime + config.attackCooldown)
             {
                 AttackPlayer();
+                Debug.Log("Ataca");
             }
         }
     }
-
+    
     void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.CompareTag("Player") && currentState == EnemyState.Attack)
