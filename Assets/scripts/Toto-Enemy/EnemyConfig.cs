@@ -34,7 +34,7 @@ public class EnemyConfig : ScriptableObject
     [Range(0.5f, 5f)]
     [Tooltip("Segundos entre ataques")]
     public float attackCooldown = 2f;
-    [Range(1f, 3f)]
+    [Range(1f, 6f)]
     [Tooltip("Distancia para atacar")]
     public float attackRange = 1.5f;
 

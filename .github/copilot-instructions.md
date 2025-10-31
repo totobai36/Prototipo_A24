@@ -8,7 +8,7 @@
   - Layers:
     - Default, TransparentFX, Ignore Raycast, Water, UI, Ragdoll, Character, Climb, Wall Run
 - Active game object:
-  - Name: GameManagerLife
-  - Tag: Player
+  - Name: Robot_Scout_HyperX
+  - Tag: Untagged
   - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
