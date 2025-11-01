@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: a7b18e167bb504f6986bc40bdafa6fda
+ComputeShaderImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 326213
+  packageName: LuminousFluxOrb
+  packageVersion: 1.0
+  assetPath: Assets/LuminousFluxOrb/Scripts/Diamonds.compute
+  uploadId: 771939

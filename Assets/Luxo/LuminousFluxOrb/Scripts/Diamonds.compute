@@ -1,0 +1,60 @@
+﻿#pragma kernel Diomonds
+#pragma kernel Clear
+
+shared RWTexture2D<float4> Result;
+
+struct diomonds
+{
+	float2 origin;
+	float2 velocity;
+	float radius;
+};
+
+StructuredBuffer<diomonds> diomondsBuffer;
+
+float4 clearColor;
+float4 diomondsColor;
+int texResolution;
+int clearScreen = 0;
+float time;
+
+float2 warpPos(float2 origin)
+{
+	return float2((origin.x % texResolution + texResolution) % texResolution,
+				  (origin.y % texResolution + texResolution) % texResolution);
+}
+
+void drawDiamondRepeat(int2 center, int size)
+{
+	for (int y = -size; y <= size; y++) {
+		int span = size - abs(y);
+		for (int x = -span; x <= span; x++) {
+			int2 pos = center + int2(x, y);
+			pos = warpPos(pos);
+			Result[uint2(pos)] = diomondsColor;
+		}
+	}
+}
+
+
+
+[numthreads(32,1,1)]
+void Diomonds (uint3 id : SV_DispatchThreadID)
+{
+	int2 center = (int2)(diomondsBuffer[id.x].origin + diomondsBuffer[id.x].velocity * time);
+	center = warpPos(center);
+	
+	uint radius = (int)diomondsBuffer[id.x].radius;
+
+	drawDiamondRepeat(center, radius);
+}
+
+[numthreads(8,8,1)]
+void Clear (uint3 id : SV_DispatchThreadID)
+{
+	Result[id.xy] = clearColor;
+}
+
+
+
+
