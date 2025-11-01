@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 99cd88b44346e4d609dccf9b29de5f5d
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 326213
+  packageName: LuminousFluxOrb
+  packageVersion: 1.0
+  assetPath: Assets/LuminousFluxOrb/Art/SG_MagicBall.shadergraph
+  uploadId: 771939

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8ab519dde8aa44dfcab1ece840f5763b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 326213
+  packageName: LuminousFluxOrb
+  packageVersion: 1.0
+  assetPath: Assets/LuminousFluxOrb/Scripts/Editor/DiomondsControllerEditor.cs
+  uploadId: 771939

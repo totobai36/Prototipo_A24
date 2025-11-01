@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a4dad02d1eac79543ad24195f8f20ba7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 326213
+  packageName: LuminousFluxOrb
+  packageVersion: 1.0
+  assetPath: Assets/LuminousFluxOrb/Standard_Renderer.asset
+  uploadId: 771939
