@@ -12,6 +12,9 @@ TagManager:
   - Teeter
   - JumpDestination
   - MovableGround
+  - WallRun
+  - PuertaIzq
+  - PuertaDer
   layers:
   - Default
   - TransparentFX
