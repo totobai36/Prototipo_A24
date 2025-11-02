@@ -24,6 +24,10 @@ public class Switch : MonoBehaviour
     [Header("Eventos - Principio Open/Closed")]
     public UnityEvent OnSwitchActivated;
 
+    [Header("Puertas que se desactivan al activar el Switch")]
+    [SerializeField] private GameObject[] doorsToDeactivate;
+
+
     void Awake()
     {
         if (OnSwitchActivated == null)
@@ -77,8 +81,19 @@ public class Switch : MonoBehaviour
             // él inicia el timer. Si no, lo iniciamos aquí.
             TimeLifeManager.Instance.StartTimer(); 
         }
+
+        // 🔹 Desactivar las puertas
+        foreach (var door in doorsToDeactivate)
+        {
+            if (door != null)
+            {
+                door.SetActive(false);
+                Debug.Log($"Puerta {door.name} desactivada por el Switch.");
+            }
+        }
+
     }
-    
+
     // ... (El resto del método PlaySwitchEffects no se modifica)
     void PlaySwitchEffects()
     {
