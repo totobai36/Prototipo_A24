@@ -3763,6 +3763,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManagerLife
       objectReference: {fileID: 0}
+    - target: {fileID: 4331736203485306982, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 6239409774011055941, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
       propertyPath: baseTime
       value: 230
@@ -41979,15 +41983,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 672113ba13572fe4da40df2796bc3611, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.21
+      value: -52.392
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 672113ba13572fe4da40df2796bc3611, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.39
+      value: 31.9
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 672113ba13572fe4da40df2796bc3611, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.8
+      value: -0.631
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 672113ba13572fe4da40df2796bc3611, type: 3}
       propertyPath: m_LocalRotation.w
