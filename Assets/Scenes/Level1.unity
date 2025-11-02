@@ -8630,11 +8630,11 @@ PrefabInstance:
     - target: {fileID: 2678315010730747219, guid: 56c9095f935d4344eb137fc87b518865, type: 3}
       propertyPath: player
       value: 
-      objectReference: {fileID: 2019814378}
+      objectReference: {fileID: 0}
     - target: {fileID: 2678315010730747219, guid: 56c9095f935d4344eb137fc87b518865, type: 3}
       propertyPath: fallDetector
       value: 
-      objectReference: {fileID: 2019814380}
+      objectReference: {fileID: 0}
     - target: {fileID: 9086382965928359671, guid: 56c9095f935d4344eb137fc87b518865, type: 3}
       propertyPath: m_Name
       value: RespawManager
@@ -41602,17 +41602,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6052254720940702154, guid: d700dc09ec8e8494db66e30d091c8fa5, type: 3}
   m_PrefabInstance: {fileID: 8374859109032931496}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2019814380 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7254645156690964640, guid: d700dc09ec8e8494db66e30d091c8fa5, type: 3}
-  m_PrefabInstance: {fileID: 8374859109032931496}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 811aa8adb0423a04daaed172744350e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &2025893342
 PrefabInstance:
   m_ObjectHideFlags: 0

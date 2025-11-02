@@ -10,6 +10,7 @@ public class RespawnSystem : MonoBehaviour
     [SerializeField] private float timePenalty = 15f;
     
     [Header("Referencias")]
+    // ⚠️ Dejar estos campos sin asignar en el Inspector
     [SerializeField] private Transform player;
     [SerializeField] private FallDetector fallDetector; 
     
@@ -29,7 +30,7 @@ public class RespawnSystem : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             
-            // Suscribirse para reasignar referencias
+            // ⭐️ CLAVE: Suscribirse al evento de carga de escena para reasignar el Player
             SceneManager.sceneLoaded -= OnSceneLoaded;
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
@@ -43,8 +44,8 @@ public class RespawnSystem : MonoBehaviour
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
-    
-    // Este método se ejecuta CADA VEZ que se carga una escena.
+
+    // ❌ ELIMINAMOS EL MÉTODO Start(). La lógica ahora está aquí:
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 1. Limpia las referencias y flags antiguas
@@ -53,13 +54,13 @@ public class RespawnSystem : MonoBehaviour
         isRespawning = false;
         hasSafePosition = false; 
 
-        // ⭐️ Iniciar la Coroutine de espera para evitar condiciones de carrera
+        // 2. Iniciar la Coroutine de espera para evitar condiciones de carrera
         StartCoroutine(WaitForAndAssignPlayer());
     }
 
     private IEnumerator WaitForAndAssignPlayer()
     {
-        // Esperar un frame (o hasta que el Player aparezca)
+        // Esperar un máximo de 10 frames para que el Player aparezca
         int maxAttempts = 10;
         int attempts = 0;
         GameObject playerGO = null;
@@ -75,8 +76,7 @@ public class RespawnSystem : MonoBehaviour
         {
             player = playerGO.transform;
             
-            // ⭐️ ÚLTIMO CAMBIO CLAVE (Línea 86 aprox): Usar GetComponentInChildren para máxima seguridad.
-            // Esto funcionará sin importar si está en la raíz o en un objeto hijo.
+            // ⭐️ USO ROBUSTO: Buscar en el objeto principal y en todos los hijos
             fallDetector = player.GetComponentInChildren<FallDetector>();
 
             if (fallDetector != null)
@@ -84,25 +84,25 @@ public class RespawnSystem : MonoBehaviour
                 // Inicializar la posición segura
                 SetSafePosition(player.position); 
                 fallDetector.ResetRespawnFlag(); 
-                Debug.Log($"[RespawnSystem] Referencias reasignadas con éxito después de {attempts} intentos.");
+                Debug.Log($"[RespawnSystem] Referencias reasignadas con éxito después de {attempts} intentos. ¡Listo para respawnear!");
             }
             else
             {
+                // Si el error persiste aquí, revisa la ortografía de "FallDetector" o la jerarquía.
                 Debug.LogError("[RespawnSystem] ERROR CRÍTICO: FallDetector no encontrado en el objeto 'Player' ni en sus hijos.");
             }
         }
         else
         {
-            Debug.LogError("[RespawnSystem] El objeto 'Player' con Tag no fue encontrado después de múltiples intentos.");
+            Debug.LogError("[RespawnSystem] El objeto 'Player' con Tag no fue encontrado después de múltiples intentos. Respawn inactivo.");
         }
     }
     
     public void Respawn()
     {
-        // Comprobación de nulidad para evitar que la caída infinita siga gastando tiempo
+        // Comprobación de nulidad para evitar la caída infinita
         if (isRespawning || !hasSafePosition || player == null || fallDetector == null) 
         {
-             // Debug.LogWarning("[RespawnSystem] Respawn abortado: Faltan referencias o ya está en curso.");
              return; 
         }
 
@@ -125,7 +125,6 @@ public class RespawnSystem : MonoBehaviour
         isRespawning = true;
         
         // --- 1. Obtener Componentes del Personaje ---
-        // Usamos GetComponent porque estos componentes sí deberían estar en la raíz del objeto 'player'
         MovementComponent movementComponent = player.GetComponent<MovementComponent>(); 
         CharacterController charController = player.GetComponent<CharacterController>();  
 

@@ -8,7 +8,7 @@
   - Layers:
     - Default, TransparentFX, Ignore Raycast, Water, UI, Ragdoll, Character, Climb, Wall Run
 - Active game object:
-  - Name: Climbing Character - Rigidbody Variant
+  - Name: GameManagerLife
   - Tag: Player
-  - Layer: Character
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
