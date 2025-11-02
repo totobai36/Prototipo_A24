@@ -12,7 +12,7 @@ public class Bootstrap : MonoBehaviour
         if (AudioManager.Instance == null && audioManagerPrefab != null)
             Instantiate(audioManagerPrefab);
 
-        if (GameManager.Instance == null && gameManagerPrefab != null)
+        if (GameStateManager.Instance == null && gameManagerPrefab != null)
             Instantiate(gameManagerPrefab);
 
         // Cargar la primera escena jugable
