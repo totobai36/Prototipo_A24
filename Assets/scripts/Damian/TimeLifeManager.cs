@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
+using UnityEngine.SceneManagement; // <<-- CORRECCIÓN CLAVE
 
 [RequireComponent(typeof(AudioSource))]
 public class TimeLifeManager : MonoBehaviour
@@ -11,7 +12,6 @@ public class TimeLifeManager : MonoBehaviour
     [SerializeField] private float baseTime = 90f;
     [SerializeField] private float currentTime;
     [SerializeField] private bool isTimerActive = false;
-    // NUEVO: Tiempo de espera entre Game Over (Ragdoll) y la carga de escena.
     [SerializeField] private float gameOverDelay = 1.0f; 
 
     [Header("Pérdida de Tiempo")]
@@ -25,8 +25,8 @@ public class TimeLifeManager : MonoBehaviour
     [SerializeField] private Color redColor = Color.red;
 
     [Header("Umbrales de Color")]
-    [SerializeField] private float yellowThreshold = 0.6f; // >= 60% verde
-    [SerializeField] private float redThreshold = 0.3f; // < 30% rojo
+    [SerializeField] private float yellowThreshold = 0.6f; 
+    [SerializeField] private float redThreshold = 0.3f; 
 
     [Header("Eventos")]
     public UnityEvent OnTimerStart;
@@ -35,16 +35,13 @@ public class TimeLifeManager : MonoBehaviour
     public UnityEvent OnGameOver;
     public UnityEvent OnCriticalTime;
 
-    // Evento con payload: tiempo actual (float)
     public UnityEvent<float> OnTimerUpdated;
 
-    // Propiedades públicas
     public float CurrentTime => currentTime;
     public float BaseTime => baseTime;
     public float TimePercentage => baseTime > 0 ? currentTime / baseTime : 0f;
     public bool IsTimerActive => isTimerActive;
     
-    // Flag para evitar múltiples llamadas a la corrutina de Game Over
     private bool isGameOverProcessing = false; 
 
 
@@ -55,11 +52,30 @@ public class TimeLifeManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             currentTime = baseTime;
+            
+            // Suscribirse para resetear el estado al cargar cualquier escena
+            SceneManager.sceneLoaded -= OnSceneLoaded; 
+            SceneManager.sceneLoaded += OnSceneLoaded; 
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+    
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; 
+    }
+
+    // Handler que se ejecuta cada vez que se carga una escena
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Resetear el estado del manager
+        isGameOverProcessing = false;
+        ResetTimer(); // Esto establece isTimerActive = false
+        
+        Debug.Log($"[TimeLifeManager] Temporizador reiniciado a {baseTime} para la escena: {scene.name}");
     }
 
     public void StartTimer()
@@ -88,7 +104,6 @@ public class TimeLifeManager : MonoBehaviour
             currentTime -= Time.deltaTime;
             OnTimerUpdated?.Invoke(currentTime);
             
-            // Lógica para el umbral de tiempo crítico
             if (currentTime <= baseTime * redThreshold && currentTime > 0)
             {
                 OnCriticalTime?.Invoke();
@@ -96,7 +111,7 @@ public class TimeLifeManager : MonoBehaviour
 
             if (currentTime <= 0)
             {
-                currentTime = 0; // CORRECCIÓN CLAVE: Asegura que el tiempo nunca es negativo
+                currentTime = 0; 
                 GameOver();
             }
         }
@@ -104,7 +119,7 @@ public class TimeLifeManager : MonoBehaviour
 
     public void LoseTime(float timeToLose, Vector3? damagePosition = null)
     {
-        if (!isTimerActive || isGameOverProcessing) return;
+        if (!isTimerActive || isGameOverProcessing) return; 
 
         currentTime -= timeToLose;
         OnTimeLoss?.Invoke();
@@ -135,46 +150,33 @@ public class TimeLifeManager : MonoBehaviour
         Debug.Log($"Tiempo ganado: {timeToGain}s. Tiempo restante: {currentTime}s");
     }
 
-    // --- NUEVA LÓGICA DE GAME OVER CON DELAY ---
     void GameOver()
     {
-        // 1. Prevenir ejecuciones duplicadas.
         if (isGameOverProcessing) return; 
         
         isTimerActive = false;
-        isGameOverProcessing = true; // Activar el flag de proceso
+        isGameOverProcessing = true; 
 
-        // 2. Notifica a los suscriptores (ej: CharacterDeathHandler para el Ragdoll)
-        // El ragdoll/animación se activa INMEDIATAMENTE.
         OnGameOver?.Invoke(); 
         
         Debug.Log("GAME OVER: Tiempo agotado. Activando animación y esperando para cargar la escena...");
 
-        // 3. Inicia la Coroutine que ESPERARÁ y luego cargará la escena de derrota.
-        StartCoroutine(ProcessGameOverWithDelay(gameOverDelay)); // Usa la variable de 1.0s
+        StartCoroutine(ProcessGameOverWithDelay(gameOverDelay)); 
     }
 
     private IEnumerator ProcessGameOverWithDelay(float delay)
     {
-        // Espera el delay (1 segundo) para que se vea la animación inicial
         yield return new WaitForSeconds(delay);
 
-        // Notificar al GameStateManager para la carga de escena de Derrota
         if (GameStateManager.Instance != null)
         {
-            // Nota: Se asume que GameStateManager.Instance.OnGameOver() es público
-            // y contiene la llamada a SceneManager.LoadScene("Derrota").
             GameStateManager.Instance.OnGameOver();
         }
         else
         {
             Debug.LogError("GameStateManager.Instance no encontrado. La escena de derrota no se puede cargar.");
         }
-        
-        // El objeto TimeLifeManager será destruido con la carga de la escena.
     }
-    // --- FIN NUEVA LÓGICA DE GAME OVER CON DELAY ---
-
 
     public void ResetTimer()
     {
@@ -182,7 +184,7 @@ public class TimeLifeManager : MonoBehaviour
         isTimerActive = false;
         OnTimerUpdated?.Invoke(currentTime);
     }
-
+    
     public void FreezeTime(float duration)
     {
         StartCoroutine(FreezeTimerCoroutine(duration));
@@ -196,7 +198,6 @@ public class TimeLifeManager : MonoBehaviour
         isTimerActive = wasActive;
     }
     
-    // Métodos de daño (dejados para referencia)
     public void ProcessFallDamage(float fallDistance)
     {
         if (fallDistance >= minFallHeight)
@@ -208,7 +209,8 @@ public class TimeLifeManager : MonoBehaviour
 
     public void ProcessEnemyDamage(Vector3 damagePosition)
     {
-        LoseTime(enemyDamage, damagePosition);
+        // Se asume que el EnemyConfig.cs define la variable 'enemyDamage'
+        LoseTime(enemyDamage, damagePosition); 
     }
 
     public Color GetTimerColor()

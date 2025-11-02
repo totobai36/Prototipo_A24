@@ -59,40 +59,38 @@ public class Switch : MonoBehaviour
         }
     }
 
-    void ActivateSwitch()
+   void ActivateSwitch()
+{
+    isActivated = true;
+    PlaySwitchEffects();
+    
+    // =======================================================
+    // NUEVA LÓGICA: Cambiar el color a rojo al activarse
+    // =======================================================
+    if (visualRenderer != null)
     {
-        isActivated = true;
-        PlaySwitchEffects();
-        
-        // =======================================================
-        // NUEVA LÓGICA: Cambiar el color a rojo al activarse
-        // =======================================================
-        if (visualRenderer != null)
-        {
-            visualRenderer.material.color = activatedColor;
-        }
-        
-        OnSwitchActivated?.Invoke();
-        Debug.Log("Switch activado - notificando a otros sistemas");
-        
-        if (TimeLifeManager.Instance != null)
-        {
-            // NOTA: Si el GameStateManager está suscrito a OnSwitchActivated,
-            // él inicia el timer. Si no, lo iniciamos aquí.
-            TimeLifeManager.Instance.StartTimer(); 
-        }
-
-        // 🔹 Desactivar las puertas
-        foreach (var door in doorsToDeactivate)
-        {
-            if (door != null)
-            {
-                door.SetActive(false);
-                Debug.Log($"Puerta {door.name} desactivada por el Switch.");
-            }
-        }
-
+        visualRenderer.material.color = activatedColor;
     }
+    
+    OnSwitchActivated?.Invoke();
+    Debug.Log("Switch activado - notificando a otros sistemas");
+    
+    // ❌ ELIMINADO: Ya no iniciamos el temporizador directamente desde el Switch.
+    // if (TimeLifeManager.Instance != null)
+    // {
+    //     TimeLifeManager.Instance.StartTimer(); 
+    // }
+
+    // 🔹 Desactivar las puertas
+    foreach (var door in doorsToDeactivate)
+    {
+        if (door != null)
+        {
+            door.SetActive(false);
+            Debug.Log($"Puerta {door.name} desactivada por el Switch.");
+        }
+    }
+}
 
     // ... (El resto del método PlaySwitchEffects no se modifica)
     void PlaySwitchEffects()

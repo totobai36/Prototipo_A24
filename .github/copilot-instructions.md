@@ -4,11 +4,11 @@
 - Active scene:
   - Name: Level1
   - Tags:
-    - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ledge, LedgeLimit, Vault, Mantle, Ladder, Teeter, JumpDestination, MovableGround, WallRun
+    - Untagged, Respawn, Finish, EditorOnly, MainCamera, Player, GameController, Ledge, LedgeLimit, Vault, Mantle, Ladder, Teeter, JumpDestination, MovableGround, WallRun, PuertaIzq, PuertaDer
   - Layers:
     - Default, TransparentFX, Ignore Raycast, Water, UI, Ragdoll, Character, Climb, Wall Run
 - Active game object:
-  - Name: Robot_Scout_HyperX
-  - Tag: Untagged
-  - Layer: Default
+  - Name: Climbing Character - Rigidbody Variant
+  - Tag: Player
+  - Layer: Character
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

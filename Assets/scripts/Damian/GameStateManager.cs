@@ -7,13 +7,7 @@ public class GameStateManager : MonoBehaviour
     public enum GameState { Exploration, CountdownActive, GameOver, Victory }
     [SerializeField] private GameState currentState = GameState.Exploration;
 
-    // =======================================================
-    // FIX CLAVE: Agregar la definición del evento de cambio de estado
-    // =======================================================
     [HideInInspector] public UnityEvent<GameState> OnGameStateChanged = new UnityEvent<GameState>();
-
-    [Header("Referencias")]
-    [SerializeField] private Switch mainSwitch;
 
     [Header("Escenas")]
     [SerializeField] private string gameOverSceneName = "Derrota"; 
@@ -27,39 +21,60 @@ public class GameStateManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // Suscripción al evento de carga de escena es CRÍTICA
+            SceneManager.sceneLoaded -= OnSceneLoaded; 
+            SceneManager.sceneLoaded += OnSceneLoaded; 
         }
         else
         {
             Destroy(gameObject);
         }
     }
-
-    void Start()
+    
+    void OnDestroy()
     {
-        // Suscripción al Switch
-        if (mainSwitch != null)
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    // ❌ ELIMINAMOS EL MÉTODO Start() y su lógica de suscripción.
+
+    // Este método se ejecuta CADA VEZ que se carga una escena.
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Resetear el estado al cargar la escena de juego
+        if (scene.name != gameOverSceneName && scene.name != victorySceneName)
         {
-            mainSwitch.OnSwitchActivated.AddListener(OnSwitchActivated);
+            SetGameState(GameState.Exploration); 
+            SubscribeToSwitch(); // Vuelve a buscar y suscribirse al nuevo Switch
+        }
+    }
+    
+    // Método para buscar y suscribirse al Switch de la escena
+    private void SubscribeToSwitch()
+    {
+        // ✅ SOLUCIÓN AL ERROR: La búsqueda dinámica con FindObjectOfType
+        Switch mainSwitchInScene = FindAnyObjectByType<Switch>(); 
+
+        if (mainSwitchInScene != null)
+        {
+            // Limpiar suscripciones anteriores para evitar duplicados.
+            mainSwitchInScene.OnSwitchActivated.RemoveListener(OnSwitchActivated); 
+            mainSwitchInScene.OnSwitchActivated.AddListener(OnSwitchActivated);
             Debug.Log("Suscripción al Switch realizada con éxito."); 
         }
         else
         {
-            Debug.LogError("ERROR: La referencia 'mainSwitch' está vacía en el GameStateManager.");
+            // Ahora es un Warning (advertencia) y no un Error, ya que la lógica persistente sigue viva
+            Debug.LogWarning("Switch principal no encontrado en la escena. Asegúrese de que esté presente y que su orden de ejecución permita que los managers se inicien primero.");
         }
-        
-        // Inicializar el estado y notificar
-        SetGameState(currentState);
     }
-    
-    // =======================================================
-    // NUEVO: Método para cambiar el estado y disparar el evento
-    // =======================================================
+
     private void SetGameState(GameState newState)
     {
         if (currentState == newState) return;
 
         currentState = newState;
-        // NOTIFICACIÓN: Esto permite a ExtractionPoint (y otros scripts) reaccionar
         OnGameStateChanged?.Invoke(currentState); 
         
         Debug.Log($"[GameStateManager] Estado de juego cambiado a: {currentState}");
@@ -72,18 +87,23 @@ public class GameStateManager : MonoBehaviour
             Debug.Log("Switch activado. Iniciando Cuenta Regresiva.");
             SetGameState(GameState.CountdownActive);
             
+            // ✅ INICIAMOS EL TIMER AQUÍ
+            if (TimeLifeManager.Instance != null)
+            {
+                TimeLifeManager.Instance.StartTimer(); 
+            }
+            
             TriggerLevelTransformation();
             ChangeMusicToIntense();
         }
     }
 
-    // Lógica para OnCountdownEnd (Llamada por TimeLifeManager)
     public void OnCountdownEnd()
     {
         if (currentState == GameState.CountdownActive)
         {
             Debug.Log("El tiempo ha terminado. Game Over.");
-            OnGameOver(); // Llama a la lógica de Game Over
+            OnGameOver(); 
         }
     }
 
