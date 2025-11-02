@@ -45,14 +45,37 @@ public class GameStateManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // Suscripción al evento de carga de escena es CRÍTICA
+            SceneManager.sceneLoaded -= OnSceneLoaded; 
+            SceneManager.sceneLoaded += OnSceneLoaded; 
         }
         else
         {
             Destroy(gameObject);
         }
     }
+    
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    // ❌ ELIMINAMOS EL MÉTODO Start() y su lógica de suscripción.
 
-    void Start()
+    // Este método se ejecuta CADA VEZ que se carga una escena.
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Resetear el estado al cargar la escena de juego
+        if (scene.name != gameOverSceneName && scene.name != victorySceneName)
+        {
+            SetGameState(GameState.Exploration); 
+            SubscribeToSwitch(); // Vuelve a buscar y suscribirse al nuevo Switch
+        }
+    }
+    
+    // Método para buscar y suscribirse al Switch de la escena
+    private void SubscribeToSwitch()
     {
         // Suscripción al switch si existe
         if (mainSwitch != null)

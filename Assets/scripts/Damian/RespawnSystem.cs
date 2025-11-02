@@ -1,19 +1,21 @@
 using UnityEngine;
 using System.Collections;
-using DiasGames.Components; // Necesario para acceder a MovementComponent, Ragdoll y otras interfaces
+using DiasGames.Components; 
+using UnityEngine.SceneManagement; 
 
 public class RespawnSystem : MonoBehaviour
 {
     [Header("Configuración de Respawn")]
-    [SerializeField] private float respawnDelay = 2f;
+    [SerializeField] private float respawnDelay = 0.1f;
     [SerializeField] private float timePenalty = 15f;
     
     [Header("Referencias")]
+    // ⚠️ Dejar estos campos sin asignar en el Inspector
     [SerializeField] private Transform player;
-    [SerializeField] private FallDetector fallDetector; // Referencia al script que me permitiste modificar
+    [SerializeField] private FallDetector fallDetector; 
     
     [Header("Configuración Simple")]
-    [SerializeField] private float heightOffset = 0.0f; // Offset vertical para la posición segura
+    [SerializeField] private float heightOffset = 0.0f; 
     
     private bool isRespawning = false;
     private Vector3 lastSafePosition;
@@ -27,6 +29,10 @@ public class RespawnSystem : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // ⭐️ CLAVE: Suscribirse al evento de carga de escena para reasignar el Player
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
@@ -34,41 +40,75 @@ public class RespawnSystem : MonoBehaviour
         }
     }
     
-    void Start()
+    void OnDestroy()
     {
-        // Buscar jugador por Tag (debe tener la Tag "Player")
-        if (player == null)
-        {
-            GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
-            if (playerGO != null)
-            {
-                player = playerGO.transform;
-            }
-        }
-        
-        // Buscar FallDetector en el jugador (si no está asignado)
-        if (fallDetector == null && player != null)
-        {
-            fallDetector = player.GetComponent<FallDetector>();
-        }
-
-        // Inicializar la posición segura
-        if (player != null)
-        {
-            SetSafePosition(player.position);
-        }
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    // Método PÚBLICO para iniciar el Respawn (llamado por FallDetector)
+    // ❌ ELIMINAMOS EL MÉTODO Start(). La lógica ahora está aquí:
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 1. Limpia las referencias y flags antiguas
+        player = null; 
+        fallDetector = null;
+        isRespawning = false;
+        hasSafePosition = false; 
+
+        // 2. Iniciar la Coroutine de espera para evitar condiciones de carrera
+        StartCoroutine(WaitForAndAssignPlayer());
+    }
+
+    private IEnumerator WaitForAndAssignPlayer()
+    {
+        // Esperar un máximo de 10 frames para que el Player aparezca
+        int maxAttempts = 10;
+        int attempts = 0;
+        GameObject playerGO = null;
+
+        while (playerGO == null && attempts < maxAttempts)
+        {
+            playerGO = GameObject.FindGameObjectWithTag("Player");
+            attempts++;
+            yield return null; // Esperar al siguiente frame
+        }
+
+        if (playerGO != null)
+        {
+            player = playerGO.transform;
+            
+            // ⭐️ USO ROBUSTO: Buscar en el objeto principal y en todos los hijos
+            fallDetector = player.GetComponentInChildren<FallDetector>();
+
+            if (fallDetector != null)
+            {
+                // Inicializar la posición segura
+                SetSafePosition(player.position); 
+                fallDetector.ResetRespawnFlag(); 
+                Debug.Log($"[RespawnSystem] Referencias reasignadas con éxito después de {attempts} intentos. ¡Listo para respawnear!");
+            }
+            else
+            {
+                // Si el error persiste aquí, revisa la ortografía de "FallDetector" o la jerarquía.
+                Debug.LogError("[RespawnSystem] ERROR CRÍTICO: FallDetector no encontrado en el objeto 'Player' ni en sus hijos.");
+            }
+        }
+        else
+        {
+            Debug.LogError("[RespawnSystem] El objeto 'Player' con Tag no fue encontrado después de múltiples intentos. Respawn inactivo.");
+        }
+    }
+    
     public void Respawn()
     {
-        if (isRespawning || !hasSafePosition) return;
+        // Comprobación de nulidad para evitar la caída infinita
+        if (isRespawning || !hasSafePosition || player == null || fallDetector == null) 
+        {
+             return; 
+        }
 
-        // Llamar a la corrutina de Respawn
         StartCoroutine(PerformRespawn(lastSafePosition));
     }
 
-    // Actualiza la última posición donde el personaje estaba seguro (ej. al tocar el suelo)
     public void SetSafePosition(Vector3 position)
     {
         lastSafePosition = position + Vector3.up * heightOffset;
@@ -77,29 +117,20 @@ public class RespawnSystem : MonoBehaviour
 
     private IEnumerator PerformRespawn(Vector3 respawnPosition)
     {
+        if (player == null || fallDetector == null)
+        {
+             yield break;
+        }
+
         isRespawning = true;
         
         // --- 1. Obtener Componentes del Personaje ---
-        MovementComponent movementComponent = player.GetComponent<MovementComponent>(); // Componente Intocable
-        CharacterController charController = player.GetComponent<CharacterController>();  // Componente de Unity (asumido)
-        Ragdoll ragdoll = player.GetComponent<Ragdoll>(); // Componente Intocable
+        MovementComponent movementComponent = player.GetComponent<MovementComponent>(); 
+        CharacterController charController = player.GetComponent<CharacterController>();  
 
         // --- 2. Desactivar Movimiento y Control ---
-        // Deshabilitamos el CharacterController y el script de lógica de movimiento
-        // para un teleport limpio y para detener la gravedad/física del jugador.
-        if (movementComponent != null)
-        {
-            movementComponent.enabled = false; 
-        }
-        if (charController != null)
-        {
-            charController.enabled = false;
-        }
-        
-        // Si por alguna razón el Ragdoll está activo, lo desactivamos 
-        // (asumiendo que tu Ragdoll.cs tiene un método público para hacerlo, 
-        // aunque tu snippet solo muestra `ActivateRagdoll()`).
-        // Si tu Ragdoll no tiene `DeactivateRagdoll()`, Unity lo maneja al reactivar el CharacterController.
+        if (movementComponent != null) movementComponent.enabled = false; 
+        if (charController != null) charController.enabled = false;
         
         // --- 3. TELEPORTAR ---
         player.position = respawnPosition;
@@ -107,26 +138,19 @@ public class RespawnSystem : MonoBehaviour
         // --- 4. Esperar y Penalizar ---
         yield return new WaitForSeconds(respawnDelay);
         
-        // Aplicar Penalización de tiempo
         if (TimeLifeManager.Instance != null)
         {
             TimeLifeManager.Instance.LoseTime(timePenalty);
         }
         
         // --- 5. Reactivar Componentes ---
-        if (charController != null)
-        {
-            charController.enabled = true;
-        }
-        if (movementComponent != null)
-        {
-            movementComponent.enabled = true; // Reactiva la lógica del MovementComponent
-        }
+        if (charController != null) charController.enabled = true;
+        if (movementComponent != null) movementComponent.enabled = true; 
         
         // --- 6. Finalizar Respawn ---
-        if (fallDetector != null)
+        // Solo llamamos a ResetRespawnFlag si la referencia es válida
+        if(fallDetector != null)
         {
-            // Llama al método que agregamos a FallDetector para que pueda volver a detectar caídas.
             fallDetector.ResetRespawnFlag(); 
         }
         

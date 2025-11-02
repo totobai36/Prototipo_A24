@@ -81,6 +81,17 @@ public class EnemyAI : MonoBehaviour
     void Update()
     {
         if (player == null || config == null) return;
+        
+        // Intentar obtener el manager si es null
+        if (timeManager == null)
+        {
+            timeManager = TimeLifeManager.Instance;
+            if (timeManager == null)
+            {
+                // Si sigue siendo null, no podemos avanzar.
+                return; 
+            }
+        }
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         bool playerInZone = IsPlayerInZone();
