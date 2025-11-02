@@ -44,8 +44,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e0c3adf3d5a1445977f97462fc1bb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  victorySFX: {fileID: 0}
-  defeatSFX: {fileID: 0}
-  levelMusic: {fileID: 0}
-  musicSource: {fileID: 0}
+  mainMixer: {fileID: 24100000, guid: c6913278fad90014ba6e79afc4964c92, type: 2}
+  musicVolParam: MusicVolume
+  sfxVolParam: SFXVolume
+  musicA: {fileID: 0}
+  musicB: {fileID: 0}
+  defaultFadeTime: 1.5
   sfxSource: {fileID: 0}
+  sfxVictory: {fileID: 0}
+  sfxDefeat: {fileID: 0}
+  musicaInicio: {fileID: 0}
+  musicaTuto: {fileID: 0}
+  musicaLevel1: {fileID: 0}
+  musicaVictoria: {fileID: 0}
+  musicaDerrota: {fileID: 0}
+  musicaExploration: {fileID: 0}
+  musicaCountdown: {fileID: 0}
