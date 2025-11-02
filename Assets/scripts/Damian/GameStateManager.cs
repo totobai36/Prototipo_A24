@@ -1,26 +1,44 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameStateManager : MonoBehaviour
 {
+    // =======================================================
+    // ESTADOS DE JUEGO
+    // =======================================================
     public enum GameState { Exploration, CountdownActive, GameOver, Victory }
     [SerializeField] private GameState currentState = GameState.Exploration;
 
-    // =======================================================
-    // FIX CLAVE: Agregar la definición del evento de cambio de estado
-    // =======================================================
     [HideInInspector] public UnityEvent<GameState> OnGameStateChanged = new UnityEvent<GameState>();
 
-    [Header("Referencias")]
-    [SerializeField] private Switch mainSwitch;
-
+    // =======================================================
+    // CONFIGURACIÓN GENERAL
+    // =======================================================
     [Header("Escenas")]
-    [SerializeField] private string gameOverSceneName = "Derrota"; 
-    [SerializeField] private string victorySceneName = "Victoria"; 
-    
+    [SerializeField] private string mainMenuScene = "Inicio";
+    [SerializeField] private string tutorialScene = "Level Tuto";
+    [SerializeField] private string level1Scene = "Level 1";
+    [SerializeField] private string gameOverSceneName = "Derrota";
+    [SerializeField] private string victorySceneName = "Victoria";
+
+    [Header("Transiciones")]
+    [Tooltip("Tiempo de espera antes de cambiar de escena (para reproducir SFX o animación)")]
+    [SerializeField] private float transitionDelay = 1.0f;
+
+    [Header("Referencias opcionales")]
+    [SerializeField] private Switch mainSwitch; // si lo usas en niveles con switch
+    [SerializeField] private AudioClip musicaExploracion;
+    [SerializeField] private AudioClip musicaCountdown;
+    [SerializeField] private AudioClip musicaVictoria;
+    [SerializeField] private AudioClip musicaDerrota;
+
     public static GameStateManager Instance { get; private set; }
 
+    // =======================================================
+    // CICLO DE VIDA
+    // =======================================================
     void Awake()
     {
         if (Instance == null)
@@ -36,96 +54,121 @@ public class GameStateManager : MonoBehaviour
 
     void Start()
     {
-        // Suscripción al Switch
+        // Suscripción al switch si existe
         if (mainSwitch != null)
         {
             mainSwitch.OnSwitchActivated.AddListener(OnSwitchActivated);
-            Debug.Log("Suscripción al Switch realizada con éxito."); 
+            Debug.Log("[GameStateManager] Suscripción al Switch realizada con éxito.");
         }
-        else
-        {
-            Debug.LogError("ERROR: La referencia 'mainSwitch' está vacía en el GameStateManager.");
-        }
-        
-        // Inicializar el estado y notificar
+
+        // Inicializar estado
         SetGameState(currentState);
     }
-    
+
     // =======================================================
-    // NUEVO: Método para cambiar el estado y disparar el evento
+    // CAMBIO DE ESTADO
     // =======================================================
     private void SetGameState(GameState newState)
     {
         if (currentState == newState) return;
 
         currentState = newState;
-        // NOTIFICACIÓN: Esto permite a ExtractionPoint (y otros scripts) reaccionar
-        OnGameStateChanged?.Invoke(currentState); 
-        
-        Debug.Log($"[GameStateManager] Estado de juego cambiado a: {currentState}");
+        OnGameStateChanged?.Invoke(currentState);
+
+        Debug.Log($"[GameStateManager] Estado cambiado a: {currentState}");
     }
 
-    private void OnSwitchActivated()
+    public GameState GetCurrentState() => currentState;
+
+    // =======================================================
+    // EVENTOS PRINCIPALES DE JUEGO
+    // =======================================================
+    public void OnSwitchActivated()
     {
         if (currentState == GameState.Exploration)
         {
-            Debug.Log("Switch activado. Iniciando Cuenta Regresiva.");
+            Debug.Log("[GameStateManager] Switch activado. Iniciando cuenta regresiva...");
             SetGameState(GameState.CountdownActive);
-            
             TriggerLevelTransformation();
-            ChangeMusicToIntense();
+            ChangeMusic(musicaCountdown, true);
         }
     }
 
-    // Lógica para OnCountdownEnd (Llamada por TimeLifeManager)
+    // Llamado por TimeLifeManager cuando se acaba el tiempo
     public void OnCountdownEnd()
     {
         if (currentState == GameState.CountdownActive)
         {
-            Debug.Log("El tiempo ha terminado. Game Over.");
-            OnGameOver(); // Llama a la lógica de Game Over
+            Debug.Log("[GameStateManager] Tiempo agotado. Game Over.");
+            OnGameOver();
         }
     }
 
-    public GameState GetCurrentState()
-    {
-        return currentState;
-    }
-    
     public void OnGameOver()
     {
-        if (currentState != GameState.Victory) 
-        {
-            SetGameState(GameState.GameOver);
-            Debug.Log("Estado cambiado a: Game Over. Cargando escena...");
-            LoadScene(gameOverSceneName);
-        }
+        if (currentState == GameState.Victory) return;
+
+        SetGameState(GameState.GameOver);
+        Debug.Log("[GameStateManager] Game Over. Cargando escena de derrota...");
+        StartCoroutine(LoadSceneAfter(gameOverSceneName, transitionDelay));
+
+        // Audio
+        AudioManager.Instance?.PlayDefeat(1f);
     }
 
     public void OnVictory()
     {
         SetGameState(GameState.Victory);
-        Debug.Log("¡VICTORIA! Cargando escena...");
-        LoadScene(victorySceneName);
-    }
-    
-    void TriggerLevelTransformation()
-    {
-        // Lógica de transformación del nivel...
+        Debug.Log("[GameStateManager] ¡Victoria! Cargando escena...");
+        StartCoroutine(LoadSceneAfter(victorySceneName, transitionDelay));
+
+        AudioManager.Instance?.PlayVictory(1f);
     }
 
-    void ChangeMusicToIntense()
+    // =======================================================
+    // CARGA DE ESCENAS
+    // =======================================================
+    public void LoadMainMenu() => StartCoroutine(LoadSceneAfter(mainMenuScene, 0f));
+    public void LoadTutorial() => StartCoroutine(LoadSceneAfter(tutorialScene, 0f));
+    public void LoadLevel1() => StartCoroutine(LoadSceneAfter(level1Scene, 0f));
+
+    private IEnumerator LoadSceneAfter(string sceneName, float delay)
     {
-        // Lógica para cambiar la música...
-    }
-    
-    void LoadScene(string sceneName)
-    {
+        if (delay > 0f) yield return new WaitForSeconds(delay);
+
         if (string.IsNullOrEmpty(sceneName))
         {
-            Debug.LogError($"Nombre de escena vacío. Por favor, asigna la escena en el Inspector.");
-            return;
+            Debug.LogError("[GameStateManager] Nombre de escena vacío. No se puede cargar.");
+            yield break;
         }
+
         SceneManager.LoadScene(sceneName);
+
+        // Cambiar música automáticamente por escena
+        var am = AudioManager.Instance;
+        if (am != null)
+        {
+            if (sceneName == victorySceneName && musicaVictoria != null)
+                am.PlayMusic(musicaVictoria, 1f, false);
+            else if (sceneName == gameOverSceneName && musicaDerrota != null)
+                am.PlayMusic(musicaDerrota, 1f, false);
+            else if (sceneName == mainMenuScene && musicaExploracion != null)
+                am.PlayMusic(musicaExploracion, 1f, true);
+        }
+    }
+
+    // =======================================================
+    // AUXILIARES
+    // =======================================================
+    void TriggerLevelTransformation()
+    {
+        // Ejemplo: animaciones, cambio de materiales, etc.
+        Debug.Log("[GameStateManager] Transformando el nivel...");
+    }
+
+    void ChangeMusic(AudioClip clip, bool loop = true)
+    {
+        if (AudioManager.Instance && clip != null)
+            AudioManager.Instance.PlayMusic(clip, 1f, loop);
     }
 }
