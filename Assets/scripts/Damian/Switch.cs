@@ -75,11 +75,6 @@ public class Switch : MonoBehaviour
     OnSwitchActivated?.Invoke();
     Debug.Log("Switch activado - notificando a otros sistemas");
     
-    // ❌ ELIMINADO: Ya no iniciamos el temporizador directamente desde el Switch.
-    // if (TimeLifeManager.Instance != null)
-    // {
-    //     TimeLifeManager.Instance.StartTimer(); 
-    // }
 
     // 🔹 Desactivar las puertas
     foreach (var door in doorsToDeactivate)
@@ -92,7 +87,7 @@ public class Switch : MonoBehaviour
     }
 }
 
-    // ... (El resto del método PlaySwitchEffects no se modifica)
+    
     void PlaySwitchEffects()
     {
         if (visualFeedback != null)

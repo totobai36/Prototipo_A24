@@ -77,6 +77,22 @@ public class GameStateManager : MonoBehaviour
     // Método para buscar y suscribirse al Switch de la escena
     private void SubscribeToSwitch()
     {
+        //  SOLUCIÓN AL ERROR: La búsqueda dinámica con FindObjectOfType
+        Switch mainSwitchInScene = FindAnyObjectByType<Switch>();
+
+        if (mainSwitchInScene != null)
+        {
+            // Limpiar suscripciones anteriores para evitar duplicados.
+            mainSwitchInScene.OnSwitchActivated.RemoveListener(OnSwitchActivated);
+            mainSwitchInScene.OnSwitchActivated.AddListener(OnSwitchActivated);
+            Debug.Log("Suscripción al Switch realizada con éxito.");
+        }
+        else
+        {
+            // Ahora es un Warning (advertencia) y no un Error, ya que la lógica persistente sigue viva
+            Debug.LogWarning("Switch principal no encontrado en la escena. Asegúrese de que esté presente y que su orden de ejecución permita que los managers se inicien primero.");
+        }
+        /*
         // Suscripción al switch si existe
         if (mainSwitch != null)
         {
@@ -85,7 +101,7 @@ public class GameStateManager : MonoBehaviour
         }
 
         // Inicializar estado
-        SetGameState(currentState);
+        SetGameState(currentState);*/
     }
 
     // =======================================================
@@ -110,11 +126,26 @@ public class GameStateManager : MonoBehaviour
     {
         if (currentState == GameState.Exploration)
         {
+            Debug.Log("Switch activado. Iniciando Cuenta Regresiva.");
+            SetGameState(GameState.CountdownActive);
+
+            //  INICIAMOS EL TIMER AQUÍ
+            if (TimeLifeManager.Instance != null)
+            {
+                TimeLifeManager.Instance.StartTimer();
+            }
+
+            TriggerLevelTransformation();
+            //ChangeMusicToIntense();
+        }
+        /*
+        if (currentState == GameState.Exploration)
+        {
             Debug.Log("[GameStateManager] Switch activado. Iniciando cuenta regresiva...");
             SetGameState(GameState.CountdownActive);
             TriggerLevelTransformation();
             ChangeMusic(musicaCountdown, true);
-        }
+        }*/
     }
 
     // Llamado por TimeLifeManager cuando se acaba el tiempo

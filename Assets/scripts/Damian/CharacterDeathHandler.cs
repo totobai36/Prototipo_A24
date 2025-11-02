@@ -7,7 +7,7 @@ public class CharacterDeathHandler : MonoBehaviour
     private Ragdoll _ragdoll;
     private AbilitySystemController _abilitySystem;
     private bool isDead = false; // Flag para evitar llamadas duplicadas
-
+    
     void Awake()
     {
         _ragdoll = GetComponent<Ragdoll>();
