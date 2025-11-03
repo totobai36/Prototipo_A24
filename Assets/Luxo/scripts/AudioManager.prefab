@@ -51,12 +51,19 @@ MonoBehaviour:
   musicB: {fileID: 0}
   defaultFadeTime: 1.5
   sfxSource: {fileID: 0}
-  sfxVictory: {fileID: 0}
-  sfxDefeat: {fileID: 0}
-  musicaInicio: {fileID: 0}
+  sfxVictory: {fileID: 8300000, guid: 39cb8c7c553f4d24687fa51fa2dfda49, type: 3}
+  sfxDefeat: {fileID: 8300000, guid: 7f4d1e2a384dfa844b555fd8274a1b7c, type: 3}
+  musicaInicio: {fileID: 8300000, guid: 03d9e2adf7de7ed42b64caaf62357b57, type: 3}
   musicaTuto: {fileID: 0}
-  musicaLevel1: {fileID: 0}
-  musicaVictoria: {fileID: 0}
-  musicaDerrota: {fileID: 0}
-  musicaExploration: {fileID: 0}
-  musicaCountdown: {fileID: 0}
+  musicaLevel1: {fileID: 8300000, guid: 1e63f6ebd73f90a49a19ca9e2e784ad0, type: 3}
+  musicaVictoria: {fileID: 8300000, guid: 39cb8c7c553f4d24687fa51fa2dfda49, type: 3}
+  musicaDerrota: {fileID: 8300000, guid: 7f4d1e2a384dfa844b555fd8274a1b7c, type: 3}
+  musicaExploration: {fileID: 8300000, guid: d694dfece5c9fd54ebbe4715c4de0ce2, type: 3}
+  musicaCountdown: {fileID: 8300000, guid: cba2831b2fd715c448b62a9efda983a5, type: 3}
+  intro1: {fileID: 8300000, guid: 8e5873096bcec2a4bb749a44ad49f7f5, type: 3}
+  intro2Loop: {fileID: 8300000, guid: 03d9e2adf7de7ed42b64caaf62357b57, type: 3}
+  a1Clip: {fileID: 8300000, guid: d686987625d14b744a57f6f363224c8f, type: 3}
+  a2Clip: {fileID: 8300000, guid: cba2831b2fd715c448b62a9efda983a5, type: 3}
+  bLoop1Clip: {fileID: 8300000, guid: 1e63f6ebd73f90a49a19ca9e2e784ad0, type: 3}
+  bLoop2Clip: {fileID: 8300000, guid: d694dfece5c9fd54ebbe4715c4de0ce2, type: 3}
+  useScheduling: 1

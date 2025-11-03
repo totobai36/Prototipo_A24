@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63dcdd3c9d334429be29f07c5df88d48, type: 3}
+  m_Name: DieAbility
+  m_EditorClassIdentifier: 
+  _abilityName: 
+  _autoStart: 0
+  _activationTags:
+    _tags: []
+  _requiredTags:
+    _tags: []
+  _blockingTags:
+    _tags: []
+  _cancelWithTags:
+    _tags: []
+  _dieClip: {fileID: 0}
+  _keepVerticalSpeed: 0
+  _timeToRestartLevel: 4
