@@ -120,6 +120,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 10.344094
       objectReference: {fileID: 0}
+    - target: {fileID: 5417389392075342130, guid: 68797c8790df0784b92ba23169b8608f, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: -115542043252710351, guid: c6913278fad90014ba6e79afc4964c92, type: 2}
     - target: {fileID: 6310456621997584923, guid: 68797c8790df0784b92ba23169b8608f, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -148,6 +152,10 @@ PrefabInstance:
       propertyPath: _updateMode
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8818895166617924686, guid: 68797c8790df0784b92ba23169b8608f, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: -115542043252710351, guid: c6913278fad90014ba6e79afc4964c92, type: 2}
     - target: {fileID: 8819704702698310936, guid: 68797c8790df0784b92ba23169b8608f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 28.650179
@@ -254,8 +262,8 @@ MonoBehaviour:
   isFalling: 0
   enableFallDamage: 1
   deathHeight: -50
-  enableRespawn: 1
   maxSafeFallDistance: 15
+  enableRespawn: 1
 --- !u!114 &1459660204110404346
 MonoBehaviour:
   m_ObjectHideFlags: 0
