@@ -1951,6 +1951,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManagerLife
       objectReference: {fileID: 0}
+    - target: {fileID: 4331736203485306982, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239409774011055941, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: baseTime
+      value: 230
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239409774011055941, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: isTimerActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6785563197983872240, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: mainSwitch
+      value: 
+      objectReference: {fileID: 5344537957212114836, guid: 928dc711589d58446903e244d3f63115, type: 3}
+    - target: {fileID: 6785563197983872240, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: level1Scene
+      value: Level1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6785563197983872240, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: currentState
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6785563197983872240, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
+      propertyPath: tutorialScene
+      value: level tutorial
+      objectReference: {fileID: 0}
     - target: {fileID: 9201608877089876298, guid: 9305ff44a2aa35b458ee54bc75d88bf5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.8187094

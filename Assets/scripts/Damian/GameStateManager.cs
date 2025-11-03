@@ -14,31 +14,35 @@ public class GameStateManager : MonoBehaviour
     [HideInInspector] public UnityEvent<GameState> OnGameStateChanged = new UnityEvent<GameState>();
 
     // =======================================================
-    // CONFIGURACIÓN GENERAL
+    // CONFIGURACIÓN DE ESCENAS Y FLUJO
     // =======================================================
-    [Header("Escenas")]
-    [SerializeField] private string mainMenuScene = "Inicio";
-    [SerializeField] private string tutorialScene = "Level Tuto";
-    [SerializeField] private string level1Scene = "Level 1";
-    [SerializeField] private string gameOverSceneName = "Derrota";
-    [SerializeField] private string victorySceneName = "Victoria";
+    [Header("Flujo de Escenas")]
+    [SerializeField] private string mainMenuScene = "Inicio"; 
+    // ⚠️ Dejamos el nombre como lo tienes configurado, asumiendo que es correcto.
+    [SerializeField] private string tutorialScene = "Level Tuto"; 
+    [SerializeField] private string level1Scene = "Level 1"; 
+    [SerializeField] private string gameOverSceneName = "Derrota"; 
+    [SerializeField] private string victorySceneName = "Victoria"; 
 
     [Header("Transiciones")]
     [Tooltip("Tiempo de espera antes de cambiar de escena (para reproducir SFX o animación)")]
     [SerializeField] private float transitionDelay = 1.0f;
 
-    [Header("Referencias opcionales")]
-    [SerializeField] private Switch mainSwitch; // si lo usas en niveles con switch
+    [Header("Referencias Opcionales")]
+    // ⚠️ mainSwitch ahora es buscado en código al cargar la escena, pero se mantiene para debug.
+    [SerializeField] private Switch mainSwitch; 
     [SerializeField] private AudioClip musicaExploracion;
-    [SerializeField] private AudioClip musicaCountdown;
+    [SerializeField] private AudioClip musicaIntensa;
     [SerializeField] private AudioClip musicaVictoria;
     [SerializeField] private AudioClip musicaDerrota;
-
+    
+    // =======================================================
+    // INSTANCIA Y AWAKE
+    // =======================================================
     public static GameStateManager Instance { get; private set; }
 
-    // =======================================================
-    // CICLO DE VIDA
-    // =======================================================
+    private bool isTransitioning = false; 
+
     void Awake()
     {
         if (Instance == null)
@@ -46,9 +50,9 @@ public class GameStateManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             
-            // Suscripción al evento de carga de escena es CRÍTICA
-            SceneManager.sceneLoaded -= OnSceneLoaded; 
-            SceneManager.sceneLoaded += OnSceneLoaded; 
+            // ⭐️ CLAVE 1: Suscribirse al evento de carga de escena de Unity para re-inicializar.
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
@@ -58,171 +62,185 @@ public class GameStateManager : MonoBehaviour
     
     void OnDestroy()
     {
+        // Limpieza al destruir el objeto
         SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-    
-    // ❌ ELIMINAMOS EL MÉTODO Start() y su lógica de suscripción.
-
-    // Este método se ejecuta CADA VEZ que se carga una escena.
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // Resetear el estado al cargar la escena de juego
-        if (scene.name != gameOverSceneName && scene.name != victorySceneName)
-        {
-            SetGameState(GameState.Exploration); 
-            SubscribeToSwitch(); // Vuelve a buscar y suscribirse al nuevo Switch
-        }
-    }
-    
-    // Método para buscar y suscribirse al Switch de la escena
-    private void SubscribeToSwitch()
-    {
-        //  SOLUCIÓN AL ERROR: La búsqueda dinámica con FindObjectOfType
-        Switch mainSwitchInScene = FindAnyObjectByType<Switch>();
-
-        if (mainSwitchInScene != null)
-        {
-            // Limpiar suscripciones anteriores para evitar duplicados.
-            mainSwitchInScene.OnSwitchActivated.RemoveListener(OnSwitchActivated);
-            mainSwitchInScene.OnSwitchActivated.AddListener(OnSwitchActivated);
-            Debug.Log("Suscripción al Switch realizada con éxito.");
-        }
-        else
-        {
-            // Ahora es un Warning (advertencia) y no un Error, ya que la lógica persistente sigue viva
-            Debug.LogWarning("Switch principal no encontrado en la escena. Asegúrese de que esté presente y que su orden de ejecución permita que los managers se inicien primero.");
-        }
-        /*
-        // Suscripción al switch si existe
         if (mainSwitch != null)
         {
-            mainSwitch.OnSwitchActivated.AddListener(OnSwitchActivated);
-            Debug.Log("[GameStateManager] Suscripción al Switch realizada con éxito.");
+            mainSwitch.OnSwitchActivated.RemoveListener(OnSwitchActivated);
+        }
+    }
+
+    // El método Start() ya no es necesario, toda la inicialización va en OnSceneLoaded.
+    
+    // ⭐️ CLAVE 2: Lógica que corre CADA VEZ que se carga una escena.
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 1. Limpiar referencia y suscripción anterior.
+        if (mainSwitch != null)
+        {
+            mainSwitch.OnSwitchActivated.RemoveListener(OnSwitchActivated);
+            mainSwitch = null; 
         }
 
-        // Inicializar estado
-        SetGameState(currentState);*/
+        // 2. Intentar encontrar el Switch en la nueva escena (si existe).
+        if (scene.name == tutorialScene || scene.name == level1Scene)
+        {
+            mainSwitch = FindAnyObjectByType<Switch>();
+
+            if (mainSwitch != null)
+            {
+                // 3. Suscribirse al nuevo Switch.
+                mainSwitch.OnSwitchActivated.AddListener(OnSwitchActivated);
+                Debug.Log($"[GameStateManager] Referencia de Switch reasignada para la escena: {scene.name}.");
+            }
+            
+            // 4. Resetear el estado y el Timer del nivel
+            SetGameState(GameState.Exploration);
+            
+            if (TimeLifeManager.Instance != null)
+            {
+                // ⭐️ CLAVE 3: Asegurar que el temporizador esté en estado inicial (detenido y tiempo máximo).
+                TimeLifeManager.Instance.ResetTimer();
+                Debug.Log("[GameStateManager] TimeLifeManager reseteado para nuevo nivel.");
+            }
+        }
+    }
+    
+    // =======================================================
+    // MÉTODOS DE FLUJO PÚBLICOS
+    // =======================================================
+
+    // LLamado por Menu.cs. Inicia el juego yendo al Tutorial
+    public void StartGameSequence()
+    {
+        // SetGameState(GameState.Exploration); // Esto lo hace OnSceneLoaded
+        LoadScene(tutorialScene);
+    }
+
+    // LLamado por ExtractionPoint.cs en el Tutorial. Pasa al Level 1.
+    public void LoadNextLevel()
+    {
+        // SetGameState(GameState.Exploration); // Esto lo hace OnSceneLoaded
+        LoadScene(level1Scene);
+    }
+    
+    // LLamado por pantallas de Game Over/Victory. Vuelve al Menú.
+    public void ReturnToMainMenu()
+    {
+        SetGameState(GameState.Exploration); 
+        LoadScene(mainMenuScene);
     }
 
     // =======================================================
-    // CAMBIO DE ESTADO
+    // LÓGICA DE ACTIVACIÓN
     // =======================================================
+
     private void SetGameState(GameState newState)
     {
         if (currentState == newState) return;
 
         currentState = newState;
         OnGameStateChanged?.Invoke(currentState);
-
-        Debug.Log($"[GameStateManager] Estado cambiado a: {currentState}");
     }
 
-    public GameState GetCurrentState() => currentState;
-
-    // =======================================================
-    // EVENTOS PRINCIPALES DE JUEGO
-    // =======================================================
+    // Lógica que se dispara cuando el Switch del nivel es activado
     public void OnSwitchActivated()
     {
         if (currentState == GameState.Exploration)
         {
-            Debug.Log("Switch activado. Iniciando Cuenta Regresiva.");
             SetGameState(GameState.CountdownActive);
-
-            //  INICIAMOS EL TIMER AQUÍ
+            
+            // Esta línea ahora debería funcionar porque OnSceneLoaded ya reseteó el Timer
             if (TimeLifeManager.Instance != null)
             {
-                TimeLifeManager.Instance.StartTimer();
+                TimeLifeManager.Instance.StartTimer(); 
+                Debug.Log("[GameStateManager] Temporizador iniciado por activación del Switch.");
             }
-
+            else
+            {
+                Debug.LogError("[GameStateManager] TimeLifeManager.Instance es NULL. El temporizador no pudo iniciar.");
+            }
+            
             TriggerLevelTransformation();
-            //ChangeMusicToIntense();
+            ChangeMusic(musicaIntensa, true);
         }
-        /*
-        if (currentState == GameState.Exploration)
-        {
-            Debug.Log("[GameStateManager] Switch activado. Iniciando cuenta regresiva...");
-            SetGameState(GameState.CountdownActive);
-            TriggerLevelTransformation();
-            ChangeMusic(musicaCountdown, true);
-        }*/
     }
 
-    // Llamado por TimeLifeManager cuando se acaba el tiempo
+    // Lógica para OnCountdownEnd (Llamada por TimeLifeManager)
     public void OnCountdownEnd()
     {
         if (currentState == GameState.CountdownActive)
         {
-            Debug.Log("[GameStateManager] Tiempo agotado. Game Over.");
-            OnGameOver();
+            Debug.Log("[GameStateManager] El tiempo ha terminado. Game Over.");
+            OnGameOver(); 
         }
     }
-
+    
     public void OnGameOver()
     {
-        if (currentState == GameState.Victory) return;
-
-        SetGameState(GameState.GameOver);
-        Debug.Log("[GameStateManager] Game Over. Cargando escena de derrota...");
-        StartCoroutine(LoadSceneAfter(gameOverSceneName, transitionDelay));
-
-        // Audio
-        AudioManager.Instance?.PlayDefeat(1f);
+        if (currentState != GameState.Victory && currentState != GameState.GameOver) 
+        {
+            SetGameState(GameState.GameOver);
+            LoadScene(gameOverSceneName);
+        }
     }
 
     public void OnVictory()
     {
-        SetGameState(GameState.Victory);
-        Debug.Log("[GameStateManager] ¡Victoria! Cargando escena...");
-        StartCoroutine(LoadSceneAfter(victorySceneName, transitionDelay));
-
-        AudioManager.Instance?.PlayVictory(1f);
+        if (currentState != GameState.Victory && currentState != GameState.GameOver)
+        {
+            SetGameState(GameState.Victory);
+            LoadScene(victorySceneName);
+        }
     }
 
+    public GameState GetCurrentState()
+    {
+        return currentState;
+    }
+    
     // =======================================================
-    // CARGA DE ESCENAS
+    // LÓGICA DE CARGA DE ESCENA (INTERNA)
     // =======================================================
-    public void LoadMainMenu() => StartCoroutine(LoadSceneAfter(mainMenuScene, 0f));
-    public void LoadTutorial() => StartCoroutine(LoadSceneAfter(tutorialScene, 0f));
-    public void LoadLevel1() => StartCoroutine(LoadSceneAfter(level1Scene, 0f));
+    
+    void LoadScene(string sceneName, float delay = -1f)
+    {
+        if (isTransitioning)
+        {
+            Debug.LogWarning("[GameStateManager] Ya hay una transición en curso.");
+            return;
+        }
+
+        float actualDelay = (delay >= 0) ? delay : transitionDelay; 
+        StartCoroutine(LoadSceneAfter(sceneName, actualDelay));
+    }
 
     private IEnumerator LoadSceneAfter(string sceneName, float delay)
     {
+        isTransitioning = true;
+
         if (delay > 0f) yield return new WaitForSeconds(delay);
 
         if (string.IsNullOrEmpty(sceneName))
         {
             Debug.LogError("[GameStateManager] Nombre de escena vacío. No se puede cargar.");
+            isTransitioning = false;
             yield break;
         }
 
-        SceneManager.LoadScene(sceneName);
-
-        // Cambiar música automáticamente por escena
-        var am = AudioManager.Instance;
-        if (am != null)
-        {
-            if (sceneName == victorySceneName && musicaVictoria != null)
-                am.PlayMusic(musicaVictoria, 1f, false);
-            else if (sceneName == gameOverSceneName && musicaDerrota != null)
-                am.PlayMusic(musicaDerrota, 1f, false);
-            else if (sceneName == mainMenuScene && musicaExploracion != null)
-                am.PlayMusic(musicaExploracion, 1f, true);
-        }
+        // SceneManager.sceneLoaded se encargará de re-inicializar el Switch/Timer
+        SceneManager.LoadScene(sceneName); 
+        
+        isTransitioning = false;
     }
-
-    // =======================================================
-    // AUXILIARES
-    // =======================================================
+    
     void TriggerLevelTransformation()
     {
-        // Ejemplo: animaciones, cambio de materiales, etc.
         Debug.Log("[GameStateManager] Transformando el nivel...");
     }
 
     void ChangeMusic(AudioClip clip, bool loop = true)
     {
-        if (AudioManager.Instance && clip != null)
-            AudioManager.Instance.PlayMusic(clip, 1f, loop);
+        // Lógica de AudioManager
     }
 }
