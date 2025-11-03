@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d536307fd545d140a19648ef6d3bc38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseTime: 90
+  baseTime: 230
   currentTime: 0
-  isTimerActive: 1
+  isTimerActive: 0
   gameOverDelay: 1
   fallDamagePerMeter: 2
   minFallHeight: 3
@@ -88,19 +88,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d0a09e22bd4d8d45adaec071b97c235, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentState: 1
+  currentState: 0
   OnGameStateChanged:
     m_PersistentCalls:
       m_Calls: []
   mainMenuScene: Inicio
-  tutorialScene: Level Tuto
-  level1Scene: Level 1
+  tutorialScene: level tutorial
+  level1Scene: Level1
   gameOverSceneName: Derrota
   victorySceneName: Victoria
   transitionDelay: 1
   mainSwitch: {fileID: 0}
   musicaExploracion: {fileID: 0}
-  musicaCountdown: {fileID: 0}
+  musicaIntensa: {fileID: 0}
   musicaVictoria: {fileID: 0}
   musicaDerrota: {fileID: 0}
 --- !u!82 &1156636851562322693
